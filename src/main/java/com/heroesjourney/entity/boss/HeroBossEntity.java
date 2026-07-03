@@ -40,6 +40,21 @@ public abstract class HeroBossEntity extends Monster {
 
     public abstract String bossId();
 
+    /**
+     * Applies a config-driven max health value. Must only be called from a subclass constructor
+     * (or later), never from {@code createAttributes()} - that builder runs during
+     * {@code EntityAttributeCreationEvent}, which fires before configs are loaded, so reading
+     * {@code HJConfig} there throws "Cannot get config value before config is loaded".
+     */
+    protected void applyConfiguredHealth(double configuredMaxHealth) {
+        net.minecraft.world.entity.ai.attributes.AttributeInstance maxHealth =
+                this.getAttribute(net.minecraft.world.entity.ai.attributes.Attributes.MAX_HEALTH);
+        if (maxHealth != null) {
+            maxHealth.setBaseValue(configuredMaxHealth);
+        }
+        this.setHealth((float) configuredMaxHealth);
+    }
+
     public void setHomeSpawner(BlockPos pos) {
         this.homeSpawner = pos;
     }

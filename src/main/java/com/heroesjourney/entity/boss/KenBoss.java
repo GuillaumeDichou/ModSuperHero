@@ -29,11 +29,15 @@ public class KenBoss extends HeroBossEntity {
 
     public KenBoss(EntityType<? extends KenBoss> type, Level level) {
         super(type, level, BossEvent.BossBarColor.RED);
+        applyConfiguredHealth(HJConfig.KEN_HEALTH.get());
     }
 
+    // Default here (150) matches HJConfig's default and is only used as the attribute's
+    // registration-time placeholder; the constructor overwrites it with the real config value
+    // once configs are actually loaded (see HeroBossEntity#applyConfiguredHealth).
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, HJConfig.KEN_HEALTH.get())
+                .add(Attributes.MAX_HEALTH, 150.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.35D)
                 .add(Attributes.ATTACK_DAMAGE, 7.0D)
                 .add(Attributes.ATTACK_SPEED, 0.2D)

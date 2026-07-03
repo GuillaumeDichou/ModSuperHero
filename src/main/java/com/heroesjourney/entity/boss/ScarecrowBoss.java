@@ -29,11 +29,13 @@ public class ScarecrowBoss extends HeroBossEntity implements RangedAttackMob {
 
     public ScarecrowBoss(EntityType<? extends ScarecrowBoss> type, Level level) {
         super(type, level, BossEvent.BossBarColor.GREEN);
+        applyConfiguredHealth(HJConfig.SCARECROW_HEALTH.get());
     }
 
+    // Default here (200) matches HJConfig's default; see HeroBossEntity#applyConfiguredHealth.
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, HJConfig.SCARECROW_HEALTH.get())
+                .add(Attributes.MAX_HEALTH, 200.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.28D)
                 .add(Attributes.ATTACK_DAMAGE, 4.0D)
                 .add(Attributes.FOLLOW_RANGE, 32.0D);

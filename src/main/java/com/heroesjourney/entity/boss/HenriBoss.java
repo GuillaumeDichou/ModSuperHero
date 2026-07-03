@@ -34,11 +34,13 @@ public class HenriBoss extends HeroBossEntity {
 
     public HenriBoss(EntityType<? extends HenriBoss> type, Level level) {
         super(type, level, BossEvent.BossBarColor.PURPLE);
+        applyConfiguredHealth(HJConfig.HENRI_HEALTH.get());
     }
 
+    // Default here (250) matches HJConfig's default; see HeroBossEntity#applyConfiguredHealth.
     public static AttributeSupplier.Builder createAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, HJConfig.HENRI_HEALTH.get())
+                .add(Attributes.MAX_HEALTH, 250.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.32D)
                 .add(Attributes.ATTACK_DAMAGE, 8.0D)
                 .add(Attributes.ATTACK_SPEED, 0.3D)
