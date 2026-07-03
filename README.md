@@ -13,18 +13,45 @@ armure/gadgets, 3 boss, prison/monastère/asile/train) **a déjà été compilé
 succès chez toi** après plusieurs allers-retours de correction d'API (voir l'historique des
 commits) - c'est du code éprouvé, pas une hypothèse.
 
-Le **Manoir Wayne dédié** (`structure/wayne/WayneManorStructure.java`,
-`structure/wayne/WayneManorPiece.java`, `structure/BuildUtil.java`) est en revanche du code neuf,
-écrit avec le même soin mais **pas encore compilé ni testé en jeu**. Recompile
-(`./gradlew build`) et relance avant de retester la quête 1 - voir "Le domaine Wayne Manor"
-plus bas pour les repères en jeu. Points à vérifier en priorité si une erreur apparaît :
-1. **`BedPart`/`BlockStateProperties.BED_PART`** (`WayneManorPiece#buildBedroom`) - API de blockstate la plus récemment ajoutée au fichier, jamais exercée ailleurs dans le mod.
-2. **`WayneManorStructure#findGenerationPoint`** - même schéma que `HeroBuildingStructure` (déjà
-   validé en jeu), donc risque faible, mais la `BoundingBox` couvre une emprise bien plus grande
-   (90x90x50) qu'avant.
-3. Les blocs de palette moins courants (`Blocks.SHORT_GRASS`, `Blocks.ANDESITE_WALL`,
-   `Blocks.DEEPSLATE_TILE_SLAB`, `Blocks.WHITE_TERRACOTTA`, ...) - noms a priori corrects pour
-   1.21.1 mais jamais utilisés ailleurs dans le code existant.
+Le **Manoir Wayne** vient d'être **entièrement reconstruit une deuxième fois** : au lieu d'un
+bâtiment généré procéduralement en Java (l'ancienne version, qui donnait un résultat visuel
+insuffisant), il charge maintenant deux **gabarits NBT tout faits** que tu as fournis
+(`data/heroesjourney/structure/wayne_manor.nbt` et `wayne_cemetery.nbt`) via le système vanilla
+`TemplateStructurePiece` (celui utilisé par les Ruined Portals, igloos, ocean ruins, etc. - donc
+le "coller un NBT dans le monde" en lui-même est du code vanilla éprouvé, pas quelque chose
+d'écrit à la main ici). Ce qui EST neuf et **pas encore compilé** :
+1. **`WayneManorPiece`/`WayneCemeteryPiece` (`structure/wayne/*.java`)** - héritent de
+   `TemplateStructurePiece` avec un constructeur de désérialisation qui prend un
+   `StructurePieceSerializationContext` et appelle `context.structureTemplateManager()`. C'est
+   la zone à plus haut risque de ce round : je n'ai pas pu vérifier par compilation réelle que
+   `structureTemplateManager()` existe bien sur `StructurePieceSerializationContext` avec ce nom
+   exact (c'est la même méthode que les structures jigsaw vanilla utilisent pour charger leurs
+   pools, donc probable, mais pas confirmé ici).
+2. **`HJStructurePieceTypes`** - `WAYNE_MANOR`/`WAYNE_CEMETERY` sont maintenant enregistrés comme
+   `StructurePieceType` "de base" (contexte + tag), pas `ContextlessType` comme `HERO_BUILDING` -
+   à vérifier si le type de retour du lambda `WayneManorPiece::new` s'infère correctement.
+3. **`WayneManorStructure#findGenerationPoint`** - place maintenant deux pièces
+   (`WayneManorPiece` + `WayneCemeteryPiece`) dans le même `StructurePiecesBuilder`, avec un
+   décalage fixe pour le cimetière (voir "Le domaine Wayne Manor" plus bas).
+4. Les deux fichiers `.nbt` eux-mêmes : je les ai vérifiés comme des NBT gzip valides
+   (DataVersion 3955 = 1.21.1) mais je ne peux pas garantir qu'ils ne contiennent aucun blockstate
+   invalide (portes, lits, escaliers, connexions de vitres/murets) - Minecraft log une erreur par
+   bloc invalide au chargement sans crasher, donc regarde les logs au premier chargement du monde
+   si des blocs semblent manquants dans le bâtiment généré.
+
+Recompile (`./gradlew build`) et relance avant de retester la quête 1 - voir "Le domaine Wayne
+Manor" plus bas pour les repères en jeu.
+
+**Sur le bug "deux bâtiments fusionnés"** que tu as signalé : le code de l'ancien manoir
+procédural a été entièrement supprimé (plus aucune référence à `WayneManorPiece#buildGrave`, à
+`BuildUtil`, ni à un `BuildingLayout` "wayne_manor" dans `BuildingRegistry` - une seule source de
+génération existe maintenant). Mais si tu as déjà exploré/generé la zone en jeu avec un ancien
+`.jar`, les chunks concernés sont **définitivement figés** avec l'ancien contenu - Minecraft ne
+régénère jamais un chunk déjà généré, donc un nouveau `.jar` ne peut pas "effacer" l'ancien
+bâtiment sur une zone déjà visitée. J'ai changé le `salt` du `structure_set` (741001 → 741002)
+pour que le nouveau manoir vise une grille de chunks différente et ne retombe pas sur l'ancien
+site par coïncidence, mais le vrai correctif est de **tester sur un monde neuf, ou dans une zone
+jamais explorée** de ton monde actuel.
 
 ## Installation
 
@@ -90,41 +117,46 @@ du placement de structures rechargeable sans recompiler.
 
 Contrairement aux 4 autres structures (prison, monastère, asile, train), qui utilisent toutes le
 système générique "boîte simple" (`HeroBuildingStructure`/`HeroBuildingPiece`), le Manoir Wayne a
-sa **propre structure dédiée** (`com.heroesjourney.structure.wayne.WayneManorStructure` /
-`WayneManorPiece`) : un domaine complet d'environ **90x90 blocs**, construit intégralement en
-code (pas de gabarit NBT), avec :
+sa **propre structure dédiée** (`com.heroesjourney.structure.wayne.WayneManorStructure`), qui
+place **deux gabarits NBT** (fournis par toi, pas générés en code) dans la même génération :
 
-- Un **manoir** de 35x25 au sol, 2 étages + attique, hall d'entrée en double hauteur avec grand
-  escalier et galerie balustrée à l'étage, bibliothèque, salle à manger, salon, cuisine/office
-  côté rez-de-chaussée ; chambre de Bruce + 3 autres chambres et une salle de bain à l'étage ;
-  tourelle/avant-corps central en façade, toit en croupe (hip roof) à degrés en ardoise
-  (`deepslate tiles`), cheminées, fenêtres à meneaux en verre.
-- Un **jardin** clos sur tout le pourtour par une **grille "noble"** (piliers en `stone brick
-  wall` + lanternes tous les 5 blocs, reliés par des `iron bars`), avec un **portail** plus large
-  et plus orné dans l'axe de l'allée.
-- Une **allée** en andesite bordée de topiaires, du portail jusqu'au perron d'entrée.
-- Un **cimetière familial** dans un enclos séparé à l'arrière du jardin (muret bas + entrée),
-  avec les tombes de Thomas et Martha Wayne côte à côte, un arbre isolé et un peu de végétation.
+- **`wayne_manor.nbt`** (71x28x47, façade au sud) — le manoir lui-même.
+- **`wayne_cemetery.nbt`** (15x6x11, entrée au sud) — le cimetière familial, placé automatiquement
+  **15 blocs à l'est** du manoir (`CEMETERY_OFFSET_X = MANOR_SIZE_X + 15` dans
+  `WayneManorStructure.java`), centré sur la même profondeur (`z`) que le manoir, au même niveau
+  de sol.
 
-Le terrain est entièrement **nivelé à plat** avant construction (voir "simplifié" ci-dessous), et
-la zone de protection (voir plus haut) couvre désormais toute cette emprise de 90x90, pas
-seulement le bâtiment.
+Les deux gabarits partagent la même génération (`StructurePiecesBuilder`), donc la même règle de
+rareté/biome et la même zone de protection.
 
-### Repères / coordonnées (relatives à l'origine du domaine, coin sud-ouest au niveau du sol)
+### L'ancre de la quête 1 (tombes de Thomas et Martha Wayne)
+
+`WayneCemeteryPiece#postProcess` pose deux blocs marqueurs du mod
+(`heroesjourney:wayne_grave_thomas`/`_martha`) directement sur les deux stèles du gabarit
+(positions locales `(5,1,3)` et `(9,1,3)` dans le template, comme convenu), calculés à partir de
+`this.templatePosition` — c'est-à-dire la position **réelle** de la pièce en monde, fixée une
+seule fois au moment de la génération. La condition de quête (`ProximityToBlockCondition` sur
+`wayne_grave_thomas`, rayon 6) n'a donc plus aucun décalage codé en dur : elle cherche juste "ce
+bloc à proximité", où qu'il ait été réellement posé.
+
+### Repères / coordonnées
 
 - `/locate structure heroesjourney:wayne_manor` renvoie les coordonnées du **centre du manoir**
-  (pas du coin du domaine) — c'est le repère le plus pratique pour s'y téléporter.
-- Le manoir occupe `x: 27 à 61`, `z: 38 à 62` (relatif à l'origine du domaine) ; l'entrée
-  principale est au sud (côté portail/allée), sur la face `z = 38`.
-- Le cimetière est à `x: 8 à 26`, `z: 66 à 84` — donc au nord-ouest du manoir, à l'écart du
-  bâtiment mais dans l'enceinte. Les deux tombes sont au centre de cet enclos.
-- Le portail principal est au sud du domaine (`z` proche de 2), dans l'axe de l'allée qui mène
-  au perron du manoir.
+  (calculé dans `WayneManorStructure#findGenerationPoint`, indépendant du coin du domaine) — c'est
+  le repère le plus pratique pour s'y téléporter.
+- Le cimetière est à l'**est** du manoir : depuis le centre du manoir, avance d'environ
+  `71/2 + 15 + 15/2 ≈ 58` blocs vers l'est (`+x`) pour l'atteindre.
+- Protection du domaine : couvre l'emprise du manoir + celle du cimetière, chacune avec une marge
+  de 8 blocs tout autour (`PROTECTION_MARGIN` dans `WayneManorPiece`/`WayneCemeteryPiece`).
 
-Pour retester la quête 1 rapidement sans chercher le manoir : `/heroesjourney progress <joueur>
-batman_nolan 0` remet le joueur à l'étape 1, puis `/locate structure heroesjourney:wayne_manor`
-donne les coordonnées à côté desquelles se téléporter (`/tp`), et il suffit de marcher jusqu'au
-cimetière (nord-ouest du manoir, à l'écart du bâtiment).
+Pour retester la quête 1 rapidement : `/heroesjourney progress <joueur> batman_nolan 0` remet le
+joueur à l'étape 1, puis `/locate structure heroesjourney:wayne_manor` donne les coordonnées à
+côté desquelles se téléporter (`/tp`), et il suffit de marcher ~58 blocs vers l'est jusqu'au
+cimetière.
+
+**Rappel important** : teste ceci sur un **monde neuf** ou dans une **zone jamais explorée** — un
+monde où tu as déjà généré/visité l'ancien manoir procédural avec un `.jar` précédent gardera ces
+anciens chunks tels quels (voir l'avertissement en haut du document).
 
 ## Ce qui est fonctionnel
 
@@ -140,8 +172,9 @@ cimetière (nord-ouest du manoir, à l'écart du bâtiment).
   (carte, capacité, passifs, recettes, kit de départ, déblocage du manoir).
 - **Protection du Manoir Wayne** par joueur (casse/pose/explosions/spawns) tant que la quête 7
   n'est pas validée - couvre désormais tout le domaine (90x90), pas juste le bâtiment.
-- **Domaine Wayne Manor dédié** : manoir à 2 étages + attique avec pièces meublées, jardin clos
-  d'une grille en pierre/fer forgé, allée à topiaires, cimetière familial séparé (voir plus haut) -
+- **Domaine Wayne Manor dédié** : manoir + cimetière familial séparé chargés depuis tes gabarits
+  NBT (`wayne_manor.nbt`/`wayne_cemetery.nbt`), placés ensemble dans la même génération, ancre de
+  quête 1 calculée dynamiquement depuis la position réelle du cimetière (voir plus haut) -
   pas encore compilé/testé en jeu, voir l'avertissement en haut du document.
 - **Armure et gadgets** avec leurs mécaniques : cagoule (vision nocturne), plané de la cape en
   sneak+chute, réduction des dégâts de chute, bottes (vitesse), batarang boomerang avec
@@ -159,24 +192,18 @@ cimetière (nord-ouest du manoir, à l'écart du bâtiment).
   système générique "boîte simple avec porte/fenêtres/toit plat" (pas de cellules détaillées, pas
   de train qui traverse plusieurs wagons distincts) — choix assumé de robustesse plutôt que 4
   structures ambitieuses risquant d'être bancales sans possibilité de test en jeu. Elles ne
-  tournent pas (orientation fixe) pour la même raison. Le Manoir Wayne, lui, a maintenant sa
-  propre structure dédiée et détaillée (voir "Le domaine Wayne Manor" plus haut) ; il ne tourne
-  pas non plus (orientation fixe, façade toujours au sud) pour la même raison de robustesse.
-- **Manoir Wayne - mobilier** : fauteuils/chaises simulés avec des `stairs`, table avec des
-  `fence`+`pressure_plate`/`carpet`, cheminées avec une alcôve en pierre taillée + `lantern`
-  plutôt qu'un vrai feu. Pas de lustre suspendu au-dessus du hall, pas de tableaux/`item_frame` -
-  jugés trop risqués à placer correctement en code procédural (orientation, entités) pour le
-  bénéfice visuel apporté ; à ajouter dans une itération future si souhaité.
-- **Manoir Wayne - pierres tombales** : pas de texte gravé (`sign`) sur les tombes - l'API de
-  configuration du texte d'un panneau par code n'a pas été jugée assez sûre à utiliser à l'aveugle
-  ici ; la tombe reste identifiable par sa position (voir repères ci-dessus) et par son bloc
-  marqueur dédié (`heroesjourney:wayne_grave_thomas`/`_martha`).
-- **Manoir Wayne - terrain** : le domaine entier (90x90) est nivelé à plat avant construction
-  (pas de suivi fin du relief) - un vrai adoucissement du terrain existant serait beaucoup plus
-  complexe à coder correctement ; sur un biome plaine/prairie l'effet reste discret, mais un
-  domaine généré à flanc de colline prononcée peut laisser une petite marche visible en bordure.
-- **Manoir Wayne - portail** : ouverture symbolique encadrée de piliers plus hauts, sans vantail
-  fonctionnel (pas de porte à ouvrir/fermer).
+  tournent pas (orientation fixe) pour la même raison. Le Manoir Wayne, lui, utilise maintenant
+  tes gabarits NBT tout faits (voir "Le domaine Wayne Manor" plus haut) ; il ne tourne pas non
+  plus (`Rotation.NONE`/`Mirror.NONE` fixes, façade toujours au sud) — activer la rotation
+  demanderait de vérifier que le gabarit se recadre proprement, pas fait ici par prudence.
+- **Manoir Wayne - pierres tombales** : pas de texte gravé (`sign`) sur les tombes du gabarit -
+  la tombe reste identifiable par sa position (voir repères ci-dessus) et par le bloc marqueur
+  dédié que le mod pose par-dessus (`heroesjourney:wayne_grave_thomas`/`_martha`).
+- **Manoir Wayne - terrain** : aucun nivellement/adoucissement du terrain autour des gabarits
+  (contrairement à l'ancienne version procédurale) - le placement suit la heightmap au centre de
+  l'emprise, donc sur un terrain accidenté le manoir ou le cimetière peuvent légèrement flotter ou
+  s'enfoncer sur les bords ; à corriger dans une itération future si besoin (adaptation de terrain
+  `beard_thin` dans `worldgen/structure/wayne_manor.json` atténue déjà une partie de l'effet).
 - **Carte au trésor** : au lieu d'une vraie carte Minecraft dessinée, l'objet reçu porte un nom et
   une description ("Direction : NE, ~800 blocs") calculés une fois au moment de la récompense,
   plutôt qu'un compas qui se met à jour en continu.

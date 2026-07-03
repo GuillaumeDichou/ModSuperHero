@@ -74,10 +74,10 @@ public final class BatmanContent {
     // -------------------------------------------------------------------
 
     private static void registerBuildings() {
-        // Wayne Manor is NOT registered here: it has its own dedicated structure/piece
-        // (com.heroesjourney.structure.wayne.*) instead of using the generic BuildingLayout
-        // system, since it needs a full multi-storey interior the generic "simple box" system
-        // was never meant to express. See WayneManorPiece for the actual estate layout.
+        // Wayne Manor is NOT registered here: it has its own dedicated structure/pieces
+        // (com.heroesjourney.structure.wayne.*) that stamp pre-built NBT templates
+        // (wayne_manor.nbt / wayne_cemetery.nbt) instead of using the generic BuildingLayout
+        // "simple box" system.
 
         BuildingRegistry.register("prison", new BuildingLayout(
                 15, 5, 13,
@@ -245,10 +245,10 @@ public final class BatmanContent {
                 "graves",
                 Component.translatable("quest.heroesjourney.batman.1.title"),
                 Component.translatable("quest.heroesjourney.batman.1.description"),
-                // The grave marker block IS the anchor: WayneManorPiece#buildGrave always places
-                // it as the topmost, frontmost block of the grave (never buried under the
-                // headstone), so this condition only ever needs "is this block near the player",
-                // never a coordinate offset from the manor/estate origin.
+                // The grave marker block IS the anchor: WayneCemeteryPiece#postProcess stamps it
+                // directly on top of the cemetery template's own steles at the piece's real world
+                // position (this.templatePosition), so this condition only ever needs "is this
+                // block near the player", never a coordinate offset copied from the manor/estate.
                 List.of(new QuestObjective("visit_graves", Component.translatable("objective.heroesjourney.batman.visit_graves"),
                         new ProximityToBlockCondition(HJItems.WAYNE_GRAVE_THOMAS.get(), 6))),
                 List.of(reward(Component.translatable("reward.heroesjourney.batman.map_to_prison"), player ->
