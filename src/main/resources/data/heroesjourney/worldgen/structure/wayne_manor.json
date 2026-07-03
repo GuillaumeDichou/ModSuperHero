@@ -1,14 +1,12 @@
 {
-  "type": "heroesjourney:hero_building",
-  "building_id": "wayne_manor",
+  "type": "heroesjourney:hero_manor_wayne",
   "step": "surface_structures",
   "terrain_adaptation": "beard_thin",
   "biomes": [
     "minecraft:plains",
     "minecraft:sunflower_plains",
-    "minecraft:forest",
-    "minecraft:flower_forest",
-    "minecraft:meadow"
+    "minecraft:meadow",
+    "minecraft:forest"
   ],
   "spawn_overrides": {}
 }

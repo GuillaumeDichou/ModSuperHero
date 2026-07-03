@@ -4,38 +4,27 @@ Mod NeoForge pour Minecraft **1.21.1** (Java 21). Premier arc d'un mod de super-
 questlines narratives : le joueur incarne Batman (version Nolan) via une progression en 7 quêtes,
 sans craft d'armure "à effets" isolé.
 
-## ⚠️ Important : ce build n'a pas pu être compilé dans l'environnement de développement
+## ⚠️ Important : ce dépôt est développé sans accès à `gradle build` côté agent
 
-Le code a été écrit intégralement dans un environnement dont la politique réseau bloque
-`maven.neoforged.net` (seul Maven Central était joignable) : **`gradle build` n'a donc pas pu être
-exécuté ni vérifié ici**, et aucun `.jar` n'a pu être produit dans `build/libs/`. Tout le code a
-été écrit avec le plus grand soin à partir du template officiel NeoForge 1.21.1 (MDK, NeoForge
-`21.1.176`, plugin ModDevGradle `2.0.91`, tiré du dépôt `neoforged/MDK` pour fiabiliser les
-versions et l'API), mais **il doit être compilé et testé en jeu avant tout usage**.
+Cet environnement de développement a une politique réseau qui bloque `maven.neoforged.net` (seul
+Maven Central est joignable), donc **`./gradlew build` ne peut être exécuté et vérifié que chez
+toi**, jamais ici. Le code de l'architecture générique et de l'arc Batman de base (roster, quêtes,
+armure/gadgets, 3 boss, prison/monastère/asile/train) **a déjà été compilé et testé en jeu avec
+succès chez toi** après plusieurs allers-retours de correction d'API (voir l'historique des
+commits) - c'est du code éprouvé, pas une hypothèse.
 
-Pour compiler :
-```bash
-./gradlew build
-```
-Le `.jar` apparaîtra dans `build/libs/heroesjourney-0.1.0.jar`.
-
-### Zones à risque si la compilation échoue en premier
-
-Par ordre de probabilité décroissante :
-1. **`HeroBuildingStructure#findGenerationPoint`** (`structure/HeroBuildingStructure.java`) — le
-   calcul de hauteur via `ChunkGenerator#getFirstFreeHeight` est la partie de l'API worldgen la
-   moins stable d'une version à l'autre.
-2. **Armures custom** (`item/armor/BatSuitArmorMaterial.java`, `HJItems`) — l'API `ArmorMaterial`
-   a été réécrite plusieurs fois entre 1.20.5 et 1.21.x.
-3. **Réseau** (`network/*Payload.java`) — l'API `StreamCodec`/`RegisterPayloadHandlersEvent` est
-   récente ; vérifier en premier si des erreurs de generics apparaissent côté `network`.
-4. **Événements NeoForge** avec des noms très proches (`LivingDamageEvent.Pre`,
-   `LivingChangeTargetEvent`, `MobSpawnEvent.PositionCheck`, `ExplosionEvent.Detonate`) dans
-   `content/batman/BatmanCombatHandler.java` et `WayneManorProtection.java`.
-5. **`BlockEntity`/`StructurePiece` NBT** (`saveAdditional`/`loadAdditional` signatures).
-
-Aucune de ces zones ne remet en cause l'architecture générique ; ce sont des points d'API isolés,
-faciles à corriger fichier par fichier une fois les vraies erreurs de compilation connues.
+Le **Manoir Wayne dédié** (`structure/wayne/WayneManorStructure.java`,
+`structure/wayne/WayneManorPiece.java`, `structure/BuildUtil.java`) est en revanche du code neuf,
+écrit avec le même soin mais **pas encore compilé ni testé en jeu**. Recompile
+(`./gradlew build`) et relance avant de retester la quête 1 - voir "Le domaine Wayne Manor"
+plus bas pour les repères en jeu. Points à vérifier en priorité si une erreur apparaît :
+1. **`BedPart`/`BlockStateProperties.BED_PART`** (`WayneManorPiece#buildBedroom`) - API de blockstate la plus récemment ajoutée au fichier, jamais exercée ailleurs dans le mod.
+2. **`WayneManorStructure#findGenerationPoint`** - même schéma que `HeroBuildingStructure` (déjà
+   validé en jeu), donc risque faible, mais la `BoundingBox` couvre une emprise bien plus grande
+   (90x90x50) qu'avant.
+3. Les blocs de palette moins courants (`Blocks.SHORT_GRASS`, `Blocks.ANDESITE_WALL`,
+   `Blocks.DEEPSLATE_TILE_SLAB`, `Blocks.WHITE_TERRACOTTA`, ...) - noms a priori corrects pour
+   1.21.1 mais jamais utilisés ailleurs dans le code existant.
 
 ## Installation
 
@@ -58,8 +47,11 @@ Les deux touches sont reconfigurables dans **Options > Contrôles > Hero's Journ
 2. `/heroesjourney progress <joueur> batman_nolan <N>` permet de sauter directement à l'étape `N`
    (0-indexé : 0 = quête 1 "tombes", 6 = quête 7 "train") sans avoir à tout rejouer — voir la
    section commandes ci-dessous.
-3. Trouver/générer (ou `/locate structure heroesjourney:wayne_manor`) un Manoir Wayne, s'approcher
-   à moins de 5 blocs des tombes → quête 1 validée, une carte vers la prison est donnée.
+3. Trouver/générer (ou `/locate structure heroesjourney:wayne_manor`, qui renvoie les coordonnées
+   du centre du manoir) un domaine Wayne, entrer dans le petit cimetière familial à l'arrière du
+   jardin (repère : ~28 blocs derrière/au nord du manoir, en dehors du bâtiment) et s'approcher à
+   moins de 6 blocs des tombes → quête 1 validée, une carte vers la prison est donnée. Voir
+   "Le domaine Wayne Manor" plus bas pour le détail du plan et des coordonnées relatives.
 4. Prison : parler aux deux prisonniers (un ment, un dit vrai), ouvrir le bon coffre pour récupérer
    la clé, s'approcher de la sortie (torche près de la porte) → Sens du détective débloqué.
 5. Monastère : parler à Ken → briefing d'entraînement (30 kills à mains nues, 3000 blocs en sprint,
@@ -94,6 +86,46 @@ du placement de structures rechargeable sans recompiler.
 
 ---
 
+## Le domaine Wayne Manor
+
+Contrairement aux 4 autres structures (prison, monastère, asile, train), qui utilisent toutes le
+système générique "boîte simple" (`HeroBuildingStructure`/`HeroBuildingPiece`), le Manoir Wayne a
+sa **propre structure dédiée** (`com.heroesjourney.structure.wayne.WayneManorStructure` /
+`WayneManorPiece`) : un domaine complet d'environ **90x90 blocs**, construit intégralement en
+code (pas de gabarit NBT), avec :
+
+- Un **manoir** de 35x25 au sol, 2 étages + attique, hall d'entrée en double hauteur avec grand
+  escalier et galerie balustrée à l'étage, bibliothèque, salle à manger, salon, cuisine/office
+  côté rez-de-chaussée ; chambre de Bruce + 3 autres chambres et une salle de bain à l'étage ;
+  tourelle/avant-corps central en façade, toit en croupe (hip roof) à degrés en ardoise
+  (`deepslate tiles`), cheminées, fenêtres à meneaux en verre.
+- Un **jardin** clos sur tout le pourtour par une **grille "noble"** (piliers en `stone brick
+  wall` + lanternes tous les 5 blocs, reliés par des `iron bars`), avec un **portail** plus large
+  et plus orné dans l'axe de l'allée.
+- Une **allée** en andesite bordée de topiaires, du portail jusqu'au perron d'entrée.
+- Un **cimetière familial** dans un enclos séparé à l'arrière du jardin (muret bas + entrée),
+  avec les tombes de Thomas et Martha Wayne côte à côte, un arbre isolé et un peu de végétation.
+
+Le terrain est entièrement **nivelé à plat** avant construction (voir "simplifié" ci-dessous), et
+la zone de protection (voir plus haut) couvre désormais toute cette emprise de 90x90, pas
+seulement le bâtiment.
+
+### Repères / coordonnées (relatives à l'origine du domaine, coin sud-ouest au niveau du sol)
+
+- `/locate structure heroesjourney:wayne_manor` renvoie les coordonnées du **centre du manoir**
+  (pas du coin du domaine) — c'est le repère le plus pratique pour s'y téléporter.
+- Le manoir occupe `x: 27 à 61`, `z: 38 à 62` (relatif à l'origine du domaine) ; l'entrée
+  principale est au sud (côté portail/allée), sur la face `z = 38`.
+- Le cimetière est à `x: 8 à 26`, `z: 66 à 84` — donc au nord-ouest du manoir, à l'écart du
+  bâtiment mais dans l'enceinte. Les deux tombes sont au centre de cet enclos.
+- Le portail principal est au sud du domaine (`z` proche de 2), dans l'axe de l'allée qui mène
+  au perron du manoir.
+
+Pour retester la quête 1 rapidement sans chercher le manoir : `/heroesjourney progress <joueur>
+batman_nolan 0` remet le joueur à l'étape 1, puis `/locate structure heroesjourney:wayne_manor`
+donne les coordonnées à côté desquelles se téléporter (`/tp`), et il suffit de marcher jusqu'au
+cimetière (nord-ouest du manoir, à l'écart du bâtiment).
+
 ## Ce qui est fonctionnel
 
 - **Architecture générique complète** : registre de héros (`HeroRegistry`), moteur de quêtes
@@ -107,7 +139,10 @@ du placement de structures rechargeable sans recompiler.
 - **Les 7 quêtes de l'arc Batman** sont câblées de bout en bout avec leurs récompenses réelles
   (carte, capacité, passifs, recettes, kit de départ, déblocage du manoir).
 - **Protection du Manoir Wayne** par joueur (casse/pose/explosions/spawns) tant que la quête 7
-  n'est pas validée.
+  n'est pas validée - couvre désormais tout le domaine (90x90), pas juste le bâtiment.
+- **Domaine Wayne Manor dédié** : manoir à 2 étages + attique avec pièces meublées, jardin clos
+  d'une grille en pierre/fer forgé, allée à topiaires, cimetière familial séparé (voir plus haut) -
+  pas encore compilé/testé en jeu, voir l'avertissement en haut du document.
 - **Armure et gadgets** avec leurs mécaniques : cagoule (vision nocturne), plané de la cape en
   sneak+chute, réduction des dégâts de chute, bottes (vitesse), batarang boomerang avec
   ralentissement, grappin avec traction physique progressive, fumigène en zone.
@@ -120,11 +155,28 @@ du placement de structures rechargeable sans recompiler.
 
 ## Ce qui est simplifié par rapport au cahier des charges
 
-- **Structures** : un seul système générique de "boîte simple avec porte/fenêtres/toit plat" (pas
-  de manoir à 2-3 étages avec bibliothèque, pas de cellules détaillées, pas de train qui traverse
-  plusieurs wagons distincts) — choix assumé de robustesse ("une version simple qui marche")
-  plutôt que 5 structures ambitieuses risquant d'être bancales sans possibilité de test en jeu.
-  Les bâtiments ne tournent pas (orientation fixe) pour la même raison.
+- **Structures autres que le Manoir Wayne** : prison, monastère, asile et train restent sur le
+  système générique "boîte simple avec porte/fenêtres/toit plat" (pas de cellules détaillées, pas
+  de train qui traverse plusieurs wagons distincts) — choix assumé de robustesse plutôt que 4
+  structures ambitieuses risquant d'être bancales sans possibilité de test en jeu. Elles ne
+  tournent pas (orientation fixe) pour la même raison. Le Manoir Wayne, lui, a maintenant sa
+  propre structure dédiée et détaillée (voir "Le domaine Wayne Manor" plus haut) ; il ne tourne
+  pas non plus (orientation fixe, façade toujours au sud) pour la même raison de robustesse.
+- **Manoir Wayne - mobilier** : fauteuils/chaises simulés avec des `stairs`, table avec des
+  `fence`+`pressure_plate`/`carpet`, cheminées avec une alcôve en pierre taillée + `lantern`
+  plutôt qu'un vrai feu. Pas de lustre suspendu au-dessus du hall, pas de tableaux/`item_frame` -
+  jugés trop risqués à placer correctement en code procédural (orientation, entités) pour le
+  bénéfice visuel apporté ; à ajouter dans une itération future si souhaité.
+- **Manoir Wayne - pierres tombales** : pas de texte gravé (`sign`) sur les tombes - l'API de
+  configuration du texte d'un panneau par code n'a pas été jugée assez sûre à utiliser à l'aveugle
+  ici ; la tombe reste identifiable par sa position (voir repères ci-dessus) et par son bloc
+  marqueur dédié (`heroesjourney:wayne_grave_thomas`/`_martha`).
+- **Manoir Wayne - terrain** : le domaine entier (90x90) est nivelé à plat avant construction
+  (pas de suivi fin du relief) - un vrai adoucissement du terrain existant serait beaucoup plus
+  complexe à coder correctement ; sur un biome plaine/prairie l'effet reste discret, mais un
+  domaine généré à flanc de colline prononcée peut laisser une petite marche visible en bordure.
+- **Manoir Wayne - portail** : ouverture symbolique encadrée de piliers plus hauts, sans vantail
+  fonctionnel (pas de porte à ouvrir/fermer).
 - **Carte au trésor** : au lieu d'une vraie carte Minecraft dessinée, l'objet reçu porte un nom et
   une description ("Direction : NE, ~800 blocs") calculés une fois au moment de la récompense,
   plutôt qu'un compas qui se met à jour en continu.

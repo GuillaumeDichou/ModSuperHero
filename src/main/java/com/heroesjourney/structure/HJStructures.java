@@ -1,6 +1,7 @@
 package com.heroesjourney.structure;
 
 import com.heroesjourney.HeroesJourney;
+import com.heroesjourney.structure.wayne.WayneManorStructure;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -16,6 +17,10 @@ public final class HJStructures {
 
     public static final DeferredHolder<StructureType<?>, StructureType<HeroBuildingStructure>> HERO_BUILDING =
             STRUCTURE_TYPES.register("hero_building", () -> () -> HeroBuildingStructure.CODEC);
+
+    /** Wayne Manor's own dedicated structure type - see {@link WayneManorStructure} for why it isn't on the generic system. */
+    public static final DeferredHolder<StructureType<?>, StructureType<WayneManorStructure>> WAYNE_MANOR_TYPE =
+            STRUCTURE_TYPES.register("hero_manor_wayne", () -> () -> WayneManorStructure.CODEC);
 
     // Structure tags referenced both by the structure_set/structure JSON (data/heroesjourney/tags/worldgen/structure)
     // and by TreasureMapFactory to find "the nearest X" for quest rewards.
