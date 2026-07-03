@@ -50,6 +50,7 @@ public class HeroesJourney {
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(HJNetworking::register);
+        modEventBus.addListener(HJEntities::registerAttributes);
 
         NeoForge.EVENT_BUS.register(QuestManager.INSTANCE);
         NeoForge.EVENT_BUS.register(new com.heroesjourney.item.armor.ArmorEffectsHandler());

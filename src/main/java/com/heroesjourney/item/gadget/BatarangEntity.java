@@ -1,7 +1,7 @@
 package com.heroesjourney.item.gadget;
 
 import com.heroesjourney.config.HJConfig;
-import com.heroesjourney.entity.HJItemEntities;
+import com.heroesjourney.entity.HJEntities;
 import com.heroesjourney.item.HJItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -27,7 +27,7 @@ public class BatarangEntity extends ThrowableItemProjectile {
     }
 
     public BatarangEntity(Level level, LivingEntity owner) {
-        super(HJItemEntities.BATARANG.get(), owner, level);
+        super(HJEntities.BATARANG.get(), owner, level);
     }
 
     @Override

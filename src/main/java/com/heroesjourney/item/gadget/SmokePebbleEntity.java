@@ -1,7 +1,7 @@
 package com.heroesjourney.item.gadget;
 
 import com.heroesjourney.config.HJConfig;
-import com.heroesjourney.entity.HJItemEntities;
+import com.heroesjourney.entity.HJEntities;
 import com.heroesjourney.item.HJItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -25,7 +25,7 @@ public class SmokePebbleEntity extends ThrowableItemProjectile {
     }
 
     public SmokePebbleEntity(Level level, LivingEntity owner) {
-        super(HJItemEntities.SMOKE_PEBBLE.get(), owner, level);
+        super(HJEntities.SMOKE_PEBBLE.get(), owner, level);
     }
 
     @Override

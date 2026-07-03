@@ -4,7 +4,6 @@ import com.heroesjourney.client.gui.HudTrackerOverlay;
 import com.heroesjourney.client.gui.RosterScreen;
 import com.heroesjourney.client.renderer.SimpleHumanoidRenderer;
 import com.heroesjourney.entity.HJEntities;
-import com.heroesjourney.entity.HJItemEntities;
 import com.heroesjourney.entity.boss.FearToxinProjectile;
 import com.heroesjourney.entity.npc.QuestNpcEntity;
 import com.heroesjourney.item.gadget.BatarangEntity;
@@ -46,8 +45,8 @@ public final class ClientSetup {
         event.registerEntityRenderer(HJEntities.KEN_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> kenTexture(), 0.6F));
         event.registerEntityRenderer(HJEntities.SCARECROW_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> scarecrowTexture(), 0.6F));
         event.registerEntityRenderer(HJEntities.HENRI_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> henriTexture(), 0.6F));
-        event.registerEntityRenderer(HJItemEntities.BATARANG.get(), ctx -> new ThrownItemRenderer<BatarangEntity>(ctx));
-        event.registerEntityRenderer(HJItemEntities.SMOKE_PEBBLE.get(), ctx -> new ThrownItemRenderer<SmokePebbleEntity>(ctx));
+        event.registerEntityRenderer(HJEntities.BATARANG.get(), ctx -> new ThrownItemRenderer<BatarangEntity>(ctx));
+        event.registerEntityRenderer(HJEntities.SMOKE_PEBBLE.get(), ctx -> new ThrownItemRenderer<SmokePebbleEntity>(ctx));
         event.registerEntityRenderer(HJEntities.FEAR_TOXIN.get(), ctx -> new ThrownItemRenderer<FearToxinProjectile>(ctx));
     }
 
