@@ -185,7 +185,7 @@ public final class QuestManager {
         }
         progress.advanceStage();
 
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP.value(), SoundSource.PLAYERS, 1.0F, 1.4F);
+        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.4F);
         Component notification = Component.translatable("heroesjourney.quest.completed", stage.title());
         player.connection.send(new ClientboundSetActionBarTextPacket(notification));
 

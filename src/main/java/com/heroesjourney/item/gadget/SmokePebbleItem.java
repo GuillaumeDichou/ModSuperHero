@@ -27,7 +27,7 @@ public class SmokePebbleItem extends Item {
                 stack.shrink(1);
             }
         }
-        level.playSound(null, player.blockPosition(), SoundEvents.SPLASH_POTION_THROW.value(), SoundSource.PLAYERS, 0.6F, 1.2F);
+        level.playSound(null, player.blockPosition(), SoundEvents.SPLASH_POTION_THROW, SoundSource.PLAYERS, 0.6F, 1.2F);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 }
