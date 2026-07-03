@@ -10,11 +10,11 @@ import com.heroesjourney.quest.QuestStage;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.client.gui.IGuiLayer;
 
 /** Small "current objective" reminder in the corner of the screen; togglable from the hero detail screen. */
-public class HudTrackerOverlay implements IGuiLayer {
+public class HudTrackerOverlay implements LayeredDraw.Layer {
 
     @Override
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker) {

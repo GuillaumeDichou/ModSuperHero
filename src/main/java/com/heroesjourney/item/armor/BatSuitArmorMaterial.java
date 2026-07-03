@@ -13,11 +13,15 @@ import net.minecraft.world.item.crafting.Ingredient;
  * Shared armor material for the whole bat-suit (cowl, chestplate, leggings, boots). Sits between
  * iron and diamond in protection as specified, and is deliberately generic-looking (not
  * "batman-only" internally) so future heroes can define their own the same way.
+ * <p>
+ * {@code ArmorMaterial} no longer carries a durability multiplier (unlike pre-1.21 versions) -
+ * see {@link #BASE_DURABILITY}, used directly in each armor {@code Item.Properties} instead.
  */
 public final class BatSuitArmorMaterial {
 
+    public static final int BASE_DURABILITY = 18;
+
     public static final Holder<ArmorMaterial> BAT_SUIT = Holder.direct(new ArmorMaterial(
-            18,
             java.util.Map.of(
                     ArmorItem.Type.HELMET, 3,
                     ArmorItem.Type.CHESTPLATE, 7,
@@ -26,11 +30,11 @@ public final class BatSuitArmorMaterial {
             ),
             12,
             SoundEvents.ARMOR_EQUIP_IRON,
-            1.5F,
-            0.05F,
             // Lazily supplied so referencing HJItems here (which itself references this class) is safe.
             () -> Ingredient.of(com.heroesjourney.item.HJItems.KEVLAR_FIBER.get()),
-            List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(HeroesJourney.MODID, "bat_suit")))
+            List.of(new ArmorMaterial.Layer(ResourceLocation.fromNamespaceAndPath(HeroesJourney.MODID, "bat_suit"))),
+            1.5F,
+            0.05F
     ));
 
     private BatSuitArmorMaterial() {

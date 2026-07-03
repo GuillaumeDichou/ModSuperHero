@@ -27,7 +27,7 @@ public class BatarangItem extends Item {
                 stack.shrink(1);
             }
         }
-        level.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 0.6F, 1.4F);
+        level.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_THROW.value(), SoundSource.PLAYERS, 0.6F, 1.4F);
         player.getCooldowns().addCooldown(stack.getItem(), 10);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }

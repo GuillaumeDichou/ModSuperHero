@@ -124,15 +124,6 @@ public final class QuestManager {
         }
     }
 
-    @SubscribeEvent
-    public void onItemPickup(PlayerEvent.ItemPickupEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
-            return;
-        }
-        String id = net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(event.getStack().getItem()).toString();
-        fireEvent(player, new QuestEvent.ItemObtained(id));
-    }
-
     // -------------------------------------------------------------------
     // Core dispatch
     // -------------------------------------------------------------------
@@ -194,7 +185,7 @@ public final class QuestManager {
         }
         progress.advanceStage();
 
-        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.4F);
+        level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP.value(), SoundSource.PLAYERS, 1.0F, 1.4F);
         Component notification = Component.translatable("heroesjourney.quest.completed", stage.title());
         player.connection.send(new ClientboundSetActionBarTextPacket(notification));
 

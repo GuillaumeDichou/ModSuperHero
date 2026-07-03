@@ -70,8 +70,8 @@ public final class WayneManorProtection {
         if (!inWayneManor(level, pos)) {
             return;
         }
-        ServerPlayer nearest = level.getNearestPlayer(event.getX(), event.getY(), event.getZ(), 32, false);
-        if (nearest != null && !hasFlag(nearest)) {
+        net.minecraft.world.entity.player.Player nearest = level.getNearestPlayer(event.getX(), event.getY(), event.getZ(), 32, false);
+        if (nearest instanceof ServerPlayer serverPlayer && !hasFlag(serverPlayer)) {
             event.setResult(MobSpawnEvent.PositionCheck.Result.FAIL);
         }
     }

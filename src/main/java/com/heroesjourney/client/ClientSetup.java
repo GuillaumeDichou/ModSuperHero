@@ -12,7 +12,7 @@ import com.heroesjourney.item.gadget.SmokePebbleEntity;
 import com.heroesjourney.network.HJNetworking;
 import com.heroesjourney.network.UseAbilityPayload;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.ThrowableItemRenderer;
+import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -46,9 +46,9 @@ public final class ClientSetup {
         event.registerEntityRenderer(HJEntities.KEN_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> kenTexture(), 0.6F));
         event.registerEntityRenderer(HJEntities.SCARECROW_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> scarecrowTexture(), 0.6F));
         event.registerEntityRenderer(HJEntities.HENRI_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> henriTexture(), 0.6F));
-        event.registerEntityRenderer(HJItemEntities.BATARANG.get(), ctx -> new ThrowableItemRenderer<BatarangEntity>(ctx));
-        event.registerEntityRenderer(HJItemEntities.SMOKE_PEBBLE.get(), ctx -> new ThrowableItemRenderer<SmokePebbleEntity>(ctx));
-        event.registerEntityRenderer(HJEntities.FEAR_TOXIN.get(), ctx -> new ThrowableItemRenderer<FearToxinProjectile>(ctx));
+        event.registerEntityRenderer(HJItemEntities.BATARANG.get(), ctx -> new ThrownItemRenderer<BatarangEntity>(ctx));
+        event.registerEntityRenderer(HJItemEntities.SMOKE_PEBBLE.get(), ctx -> new ThrownItemRenderer<SmokePebbleEntity>(ctx));
+        event.registerEntityRenderer(HJEntities.FEAR_TOXIN.get(), ctx -> new ThrownItemRenderer<FearToxinProjectile>(ctx));
     }
 
     private static void registerGuiLayers(RegisterGuiLayersEvent event) {

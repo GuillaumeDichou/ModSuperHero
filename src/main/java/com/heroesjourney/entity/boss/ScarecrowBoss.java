@@ -64,7 +64,7 @@ public class ScarecrowBoss extends HeroBossEntity implements RangedAttackMob {
         double dz = target.getZ() - this.getZ();
         projectile.shoot(dx, dy + Math.sqrt(dx * dx + dz * dz) * 0.2, dz, 1.4F, 6.0F);
         this.level().addFreshEntity(projectile);
-        this.playSound(net.minecraft.sounds.SoundEvents.WITCH_THROW, 1.0F, 1.0F);
+        this.playSound(net.minecraft.sounds.SoundEvents.WITCH_THROW.value(), 1.0F, 1.0F);
     }
 
     @Override
@@ -86,6 +86,6 @@ public class ScarecrowBoss extends HeroBossEntity implements RangedAttackMob {
             player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 140, 0));
             player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
         }
-        this.playSound(net.minecraft.sounds.SoundEvents.WITCH_AMBIENT, 1.5F, 0.6F);
+        this.playSound(net.minecraft.sounds.SoundEvents.WITCH_AMBIENT.value(), 1.5F, 0.6F);
     }
 }

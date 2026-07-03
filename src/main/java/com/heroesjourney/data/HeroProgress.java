@@ -82,7 +82,7 @@ public final class HeroProgress {
     public static final Codec<HeroProgress> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("stageIndex").forGetter(HeroProgress::stageIndex),
             Codec.unboundedMap(Codec.STRING, Codec.INT).fieldOf("objectiveProgress").forGetter(HeroProgress::objectiveProgress),
-            Codec.STRING.listOf().xmap(HashSet::new, ArrayList::new).fieldOf("flags").forGetter(HeroProgress::flags),
-            Codec.STRING.listOf().xmap(HashSet::new, ArrayList::new).fieldOf("unlockedAbilities").forGetter(HeroProgress::unlockedAbilities)
+            Codec.STRING.listOf().xmap(list -> (Set<String>) new HashSet<>(list), ArrayList::new).fieldOf("flags").forGetter(HeroProgress::flags),
+            Codec.STRING.listOf().xmap(list -> (Set<String>) new HashSet<>(list), ArrayList::new).fieldOf("unlockedAbilities").forGetter(HeroProgress::unlockedAbilities)
     ).apply(instance, HeroProgress::new));
 }

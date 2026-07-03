@@ -1,6 +1,7 @@
 package com.heroesjourney.entity.boss;
 
 import com.heroesjourney.entity.HJEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -22,6 +23,11 @@ public class BossSpawnerBlock extends BaseEntityBlock {
 
     public BossSpawnerBlock(BlockBehaviour.Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<BossSpawnerBlock> codec() {
+        return simpleCodec(BossSpawnerBlock::new);
     }
 
     @Override

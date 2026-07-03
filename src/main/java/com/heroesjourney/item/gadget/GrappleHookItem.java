@@ -37,7 +37,7 @@ public class GrappleHookItem extends Item {
         HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
 
         if (hit.getType() == HitResult.Type.MISS) {
-            level.playSound(null, player.blockPosition(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.PLAYERS, 0.6F, 1.6F);
+            level.playSound(null, player.blockPosition(), SoundEvents.FISHING_BOBBER_THROW.value(), SoundSource.PLAYERS, 0.6F, 1.6F);
             return InteractionResultHolder.fail(stack);
         }
 
@@ -45,7 +45,7 @@ public class GrappleHookItem extends Item {
             GrappleHandler.startPull(serverPlayer, hit.getLocation());
         }
         player.getCooldowns().addCooldown(stack.getItem(), HJConfig.GRAPPLE_COOLDOWN_TICKS.get());
-        level.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 0.8F, 0.8F);
+        level.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_RETURN.value(), SoundSource.PLAYERS, 0.8F, 0.8F);
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 }
