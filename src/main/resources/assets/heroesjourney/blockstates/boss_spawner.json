@@ -1,0 +1,5 @@
+{
+  "variants": {
+    "": { "model": "heroesjourney:block/boss_spawner" }
+  }
+}

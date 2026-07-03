@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    { "item": "heroesjourney:electronic_component" },
+    { "item": "heroesjourney:electronic_component" },
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:iron_ingot" },
+    { "item": "minecraft:string" },
+    { "item": "minecraft:string" },
+    { "item": "minecraft:piston" }
+  ],
+  "result": {
+    "id": "heroesjourney:grapple_hook",
+    "count": 1
+  }
+}

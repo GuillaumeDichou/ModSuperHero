@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    { "item": "heroesjourney:bat_combat_vest" },
+    { "item": "heroesjourney:bat_cape" }
+  ],
+  "result": {
+    "id": "heroesjourney:bat_armored_chestplate",
+    "count": 1
+  }
+}

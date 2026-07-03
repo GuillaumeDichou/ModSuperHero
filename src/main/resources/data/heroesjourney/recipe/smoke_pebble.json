@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    { "item": "minecraft:gunpowder" },
+    { "item": "minecraft:gunpowder" },
+    { "item": "minecraft:coal" },
+    { "item": "minecraft:glass_bottle" }
+  ],
+  "result": {
+    "id": "heroesjourney:smoke_pebble",
+    "count": 1
+  }
+}

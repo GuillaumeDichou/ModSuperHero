@@ -1,0 +1,14 @@
+{
+  "type": "heroesjourney:hero_building",
+  "building_id": "monastery",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "biomes": [
+    "minecraft:snowy_slopes",
+    "minecraft:jagged_peaks",
+    "minecraft:frozen_peaks",
+    "minecraft:stony_peaks",
+    "minecraft:grove"
+  ],
+  "spawn_overrides": {}
+}

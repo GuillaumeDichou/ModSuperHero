@@ -1,0 +1,11 @@
+{
+  "type": "heroesjourney:hero_building",
+  "building_id": "train",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "biomes": [
+    "minecraft:plains",
+    "minecraft:sunflower_plains"
+  ],
+  "spawn_overrides": {}
+}

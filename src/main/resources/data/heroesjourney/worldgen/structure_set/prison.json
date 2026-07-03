@@ -1,0 +1,12 @@
+{
+  "_comment": "Rarity ~ rare. Adjust spacing/separation freely - no recompile needed.",
+  "structures": [
+    { "structure": "heroesjourney:prison", "weight": 1 }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 741002,
+    "spacing": 42,
+    "separation": 14
+  }
+}

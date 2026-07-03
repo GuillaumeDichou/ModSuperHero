@@ -1,0 +1,12 @@
+{
+  "type": "heroesjourney:hero_building",
+  "building_id": "asylum",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "biomes": [
+    "minecraft:dark_forest",
+    "minecraft:swamp",
+    "minecraft:mangrove_swamp"
+  ],
+  "spawn_overrides": {}
+}

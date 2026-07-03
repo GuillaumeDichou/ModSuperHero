@@ -1,0 +1,15 @@
+{
+  "type": "heroesjourney:hero_building",
+  "building_id": "prison",
+  "step": "surface_structures",
+  "terrain_adaptation": "beard_thin",
+  "biomes": [
+    "minecraft:badlands",
+    "minecraft:eroded_badlands",
+    "minecraft:wooded_badlands",
+    "minecraft:savanna",
+    "minecraft:savanna_plateau",
+    "minecraft:desert"
+  ],
+  "spawn_overrides": {}
+}

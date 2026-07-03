@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" }
+  ],
+  "result": {
+    "id": "heroesjourney:bat_boots",
+    "count": 1
+  }
+}

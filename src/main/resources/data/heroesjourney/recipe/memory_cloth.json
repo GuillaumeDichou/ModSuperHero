@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "heroesjourney:kevlar_fiber" },
+    { "item": "minecraft:phantom_membrane" },
+    { "item": "minecraft:phantom_membrane" },
+    { "item": "minecraft:phantom_membrane" },
+    { "item": "minecraft:phantom_membrane" },
+    { "item": "minecraft:redstone" }
+  ],
+  "result": {
+    "id": "heroesjourney:memory_cloth",
+    "count": 1
+  }
+}

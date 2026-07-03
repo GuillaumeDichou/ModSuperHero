@@ -1,0 +1,12 @@
+{
+  "_comment": "Rarity ~ Woodland Mansion (very rare). Adjust spacing/separation freely - no recompile needed.",
+  "structures": [
+    { "structure": "heroesjourney:wayne_manor", "weight": 1 }
+  ],
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 741001,
+    "spacing": 80,
+    "separation": 20
+  }
+}
