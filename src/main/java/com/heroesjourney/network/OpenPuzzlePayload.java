@@ -17,9 +17,12 @@ public record OpenPuzzlePayload(int puzzleType, String data) implements CustomPa
     /** Field separator used inside {@link #data()}; chosen so it never collides with real content. */
     public static final String SEP = "@@";
 
-    public static final int TYPE_MEMORY = 0;
-    public static final int TYPE_LOGIC = 1;
-    public static final int TYPE_CIPHER = 2;
+    /** Mastermind-style code-breaking: crack a hidden combination of symbols. */
+    public static final int TYPE_MASTERMIND = 0;
+    /** Sliding/reassembly puzzle: rearrange shuffled image tiles back into order. */
+    public static final int TYPE_SLIDING = 1;
+    /** Lock-picking reflex mini-game: click while an oscillating cursor is in a shrinking target zone. */
+    public static final int TYPE_LOCKPICK = 2;
 
     public static final Type<OpenPuzzlePayload> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(HeroesJourney.MODID, "open_puzzle"));

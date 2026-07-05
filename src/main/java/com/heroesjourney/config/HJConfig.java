@@ -5,10 +5,6 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 /**
  * Central balancing config for Hero's Journey. Every tunable value used by the generic engine
  * or by the Batman "Origine" content lives here so designers can rebalance without recompiling.
- * <p>
- * Wayne Manor's rarity/biome placement is controlled by the datapack worldgen JSON files under
- * {@code data/heroesjourney/worldgen/structure_set/*.json} (spacing/separation) rather than this
- * TOML config, because vanilla structure placement is only reloadable through datapacks.
  */
 public class HJConfig {
 
@@ -66,9 +62,25 @@ public class HJConfig {
             .comment("Nombre d'enigmes a resoudre pour valider la quete.")
             .defineInRange("questBatman.puzzle.targetCount", 10, 1, 1000);
 
-    public static final ModConfigSpec.IntValue PUZZLE_MEMORY_LENGTH = BUILDER
-            .comment("Longueur de la sequence pour le mini-jeu 'memoire'.")
-            .defineInRange("questBatman.puzzle.memoryLength", 4, 2, 12);
+    public static final ModConfigSpec.IntValue MASTERMIND_CODE_LENGTH = BUILDER
+            .comment("Nombre de plots dans le code secret du mini-jeu 'coffre-fort' (Mastermind).")
+            .defineInRange("questBatman.puzzle.mastermindCodeLength", 4, 2, 8);
+
+    public static final ModConfigSpec.IntValue MASTERMIND_SYMBOL_COUNT = BUILDER
+            .comment("Nombre de symboles/couleurs distincts utilisables dans le code secret (2 a 6).")
+            .defineInRange("questBatman.puzzle.mastermindSymbolCount", 6, 2, 6);
+
+    public static final ModConfigSpec.IntValue LOCKPICK_PIN_COUNT = BUILDER
+            .comment("Nombre de goupilles a crocheter d'affilee pour valider le mini-jeu de crochetage.")
+            .defineInRange("questBatman.puzzle.lockpickPinCount", 3, 1, 10);
+
+    public static final ModConfigSpec.IntValue LOCKPICK_INITIAL_ZONE_WIDTH_PERCENT = BUILDER
+            .comment("Largeur (pourcentage de la barre) de la zone cible pour la premiere goupille.")
+            .defineInRange("questBatman.puzzle.lockpickInitialZoneWidthPercent", 30, 5, 100);
+
+    public static final ModConfigSpec.IntValue LOCKPICK_MIN_ZONE_WIDTH_PERCENT = BUILDER
+            .comment("Largeur (pourcentage de la barre) minimale de la zone cible, atteinte a la derniere goupille.")
+            .defineInRange("questBatman.puzzle.lockpickMinZoneWidthPercent", 10, 2, 100);
 
     public static final ModConfigSpec.IntValue CHEST_GLOW_RADIUS = BUILDER
             .comment("Rayon (blocs) dans lequel la capacite 'lueur des coffres' revele les coffres.")
@@ -90,7 +102,7 @@ public class HJConfig {
             .defineInRange("questBatman.martialArts.kills", 40, 1, 10000);
 
     public static final ModConfigSpec.DoubleValue UNARMED_DAMAGE_BONUS = BUILDER
-            .comment("Bonus additif aux degats a mains nues pour Batman Nolan actif, une fois l'entrainement aux arts martiaux valide.")
+            .comment("Bonus additif aux degats a mains nues pour Batman actif, une fois l'entrainement aux arts martiaux valide.")
             .defineInRange("questBatman.martialArts.unarmedDamageBonus", 2.0, 0.0, 20.0);
 
     public static final ModConfigSpec.DoubleValue UNARMED_ATTACK_SPEED_BONUS = BUILDER
@@ -117,10 +129,6 @@ public class HJConfig {
     public static final ModConfigSpec.DoubleValue FALL_DAMAGE_REDUCTION = BUILDER
             .comment("Reduction des degats de chute apportee par les jambieres elles-memes (0.3 = -30%).")
             .defineInRange("questBatman.armor.fallDamageReduction", 0.3, 0.0, 1.0);
-
-    public static final ModConfigSpec.DoubleValue GLIDE_FALL_SPEED = BUILDER
-            .comment("Vitesse de chute verticale (blocs/tick, negatif = vers le bas) lorsque le plastron capature est deploye.")
-            .defineInRange("questBatman.armor.glideFallSpeed", -0.09, -1.0, -0.01);
 
     public static final ModConfigSpec.DoubleValue GLIDE_HORIZONTAL_SPEED = BUILDER
             .comment("Vitesse horizontale (blocs/tick) appliquee en direction du regard pendant le plane.")
@@ -156,17 +164,6 @@ public class HJConfig {
     public static final ModConfigSpec.IntValue BATARANG_SLOW_DURATION_TICKS = BUILDER
             .comment("Duree du ralentissement inflige par un batarang qui touche sa cible (ticks).")
             .defineInRange("questBatman.gadgets.batarangSlowDurationTicks", 60, 0, 1000);
-
-    // ---------------------------------------------------------------------
-    // Wayne Manor protection (decorative in this arc - see README)
-    // ---------------------------------------------------------------------
-    public static final ModConfigSpec.BooleanValue WAYNE_MANOR_PROTECTION_ENABLED = BUILDER
-            .comment("Active la protection totale des manoirs Wayne. Aucune quete de cet arc ne retire cette protection - voir le README.")
-            .define("questBatman.wayneManor.protectionEnabled", true);
-
-    public static final ModConfigSpec.IntValue WAYNE_MANOR_PROTECTION_RADIUS = BUILDER
-            .comment("Rayon (blocs, depuis le centre de la structure) considere comme faisant partie du manoir protege.")
-            .defineInRange("questBatman.wayneManor.protectionRadius", 48, 4, 256);
 
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

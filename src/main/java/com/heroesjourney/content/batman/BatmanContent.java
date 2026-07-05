@@ -35,10 +35,8 @@ import net.minecraft.world.item.ItemStack;
  * Batman-specific facts; adding the next hero later means writing a sibling of this class, not
  * touching anything under the top-level packages.
  * <p>
- * Unlike the previous "Batman Begins" arc, this questline uses no custom structures and no
- * talking NPCs at all - every objective is driven by vanilla mobs, vanilla stats, or items. Wayne
- * Manor (see {@code structure.wayne}) is kept in the mod but is no longer wired to any quest
- * condition here - see the README for why.
+ * This questline uses no custom structures and no talking NPCs at all - every objective is driven
+ * by vanilla mobs, vanilla stats, or items.
  */
 public final class BatmanContent {
 
@@ -51,9 +49,9 @@ public final class BatmanContent {
         registerAbilities();
         HeroRegistry.register(new HeroDefinition(
                 HERO_ID,
-                Component.translatable("hero.heroesjourney.batman_nolan"),
-                Component.translatable("hero.heroesjourney.batman_nolan.description"),
-                ResourceLocation.fromNamespaceAndPath(HeroesJourney.MODID, "textures/gui/hero_batman_nolan.png"),
+                Component.translatable("hero.heroesjourney.batman"),
+                Component.translatable("hero.heroesjourney.batman.description"),
+                ResourceLocation.fromNamespaceAndPath(HeroesJourney.MODID, "textures/gui/hero_batman.png"),
                 buildQuestline(),
                 new BatmanEffects()
         ));

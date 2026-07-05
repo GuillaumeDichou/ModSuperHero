@@ -8,36 +8,12 @@ import com.heroesjourney.item.gadget.SmokePebbleItem;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.material.MapColor;
-import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class HJItems {
 
-    public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(HeroesJourney.MODID);
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(HeroesJourney.MODID);
-
-    // -----------------------------------------------------------------
-    // Blocks
-    // -----------------------------------------------------------------
-
-    // Kept for the Wayne Manor domain (decorative, no quest condition in this arc - see README).
-    public static final DeferredBlock<Block> WAYNE_GRAVE_THOMAS = BLOCKS.registerBlock("wayne_grave_thomas",
-            props -> new HeroGraveBlock(props), BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(-1.0F, 3600000.0F).noOcclusion());
-
-    public static final DeferredBlock<Block> WAYNE_GRAVE_MARTHA = BLOCKS.registerBlock("wayne_grave_martha",
-            props -> new HeroGraveBlock(props), BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(-1.0F, 3600000.0F).noOcclusion());
-
-    public static final DeferredItem<net.minecraft.world.item.BlockItem> WAYNE_GRAVE_THOMAS_ITEM =
-            ITEMS.registerSimpleBlockItem("wayne_grave_thomas", WAYNE_GRAVE_THOMAS);
-    public static final DeferredItem<net.minecraft.world.item.BlockItem> WAYNE_GRAVE_MARTHA_ITEM =
-            ITEMS.registerSimpleBlockItem("wayne_grave_martha", WAYNE_GRAVE_MARTHA);
 
     // -----------------------------------------------------------------
     // Materials

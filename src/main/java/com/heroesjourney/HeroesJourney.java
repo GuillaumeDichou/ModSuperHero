@@ -11,7 +11,6 @@ import com.heroesjourney.item.HJCreativeTabs;
 import com.heroesjourney.item.HJItems;
 import com.heroesjourney.network.HJNetworking;
 import com.heroesjourney.quest.QuestManager;
-import com.heroesjourney.structure.HJStructures;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -40,12 +39,9 @@ public class HeroesJourney {
         modContainer.registerConfig(net.neoforged.fml.config.ModConfig.Type.COMMON, HJConfig.SPEC);
 
         HJItems.ITEMS.register(modEventBus);
-        HJItems.BLOCKS.register(modEventBus);
         HJCreativeTabs.TABS.register(modEventBus);
         HJEntities.ENTITY_TYPES.register(modEventBus);
         HJAttachments.ATTACHMENT_TYPES.register(modEventBus);
-        HJStructures.STRUCTURE_TYPES.register(modEventBus);
-        com.heroesjourney.structure.HJStructurePieceTypes.STRUCTURE_PIECE_TYPES.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(HJNetworking::register);
@@ -54,7 +50,6 @@ public class HeroesJourney {
         NeoForge.EVENT_BUS.register(new com.heroesjourney.item.armor.ArmorEffectsHandler());
         NeoForge.EVENT_BUS.register(new com.heroesjourney.item.gadget.GrappleHandler());
         NeoForge.EVENT_BUS.register(new com.heroesjourney.content.batman.BatmanCombatHandler());
-        NeoForge.EVENT_BUS.register(new com.heroesjourney.content.batman.WayneManorProtection());
         NeoForge.EVENT_BUS.register(new com.heroesjourney.content.batman.BatmanRecipeGate());
         NeoForge.EVENT_BUS.addListener(this::registerCommands);
 

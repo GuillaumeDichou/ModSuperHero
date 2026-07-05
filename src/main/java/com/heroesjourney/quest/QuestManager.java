@@ -42,7 +42,7 @@ public final class QuestManager {
 
     private static final int HEARTBEAT_INTERVAL_TICKS = 20;
 
-    private final Map<UUID, net.minecraft.world.phys.Vec3> lastPositions = new HashMap<>();
+    private final Map<UUID, Integer> lastSprintStat = new HashMap<>();
     private final Map<UUID, Integer> lastJumpStat = new HashMap<>();
     private final Map<UUID, Integer> lastSwimStat = new HashMap<>();
 
@@ -61,7 +61,13 @@ public final class QuestManager {
         if (player.tickCount % HEARTBEAT_INTERVAL_TICKS == 0) {
             fireEvent(player, new QuestEvent.Heartbeat());
         }
-        trackSprintDistance(player);
+        // Distance/count objectives are driven by vanilla's own stats (the same ones behind the
+        // vanilla "distances" advancements/statistics screen) rather than hand-rolled tick
+        // detection: vanilla already tracks these reliably, so there's no risk of under/over
+        // counting from e.g. a missed ground-state transition. All three are stored by vanilla in
+        // centimetres, hence the /100.0 to recover blocks.
+        trackVanillaStatDelta(player, lastSprintStat, Stats.CUSTOM.get(Stats.SPRINT_ONE_CM),
+                delta -> new QuestEvent.SprintDistance(delta / 100.0));
         trackVanillaStatDelta(player, lastJumpStat, Stats.CUSTOM.get(Stats.JUMP),
                 delta -> new QuestEvent.PlayerJumped(delta));
         trackVanillaStatDelta(player, lastSwimStat, Stats.CUSTOM.get(Stats.SWIM_ONE_CM),
@@ -69,27 +75,11 @@ public final class QuestManager {
         HeroEffectsService.tick(player);
     }
 
-    private void trackSprintDistance(ServerPlayer player) {
-        net.minecraft.world.phys.Vec3 pos = player.position();
-        net.minecraft.world.phys.Vec3 last = lastPositions.put(player.getUUID(), pos);
-        if (last == null || !player.onGround()) {
-            return;
-        }
-        if (player.isSprinting()) {
-            double dx = pos.x - last.x;
-            double dz = pos.z - last.z;
-            double delta = Math.sqrt(dx * dx + dz * dz);
-            if (delta > 0.001 && delta < 5.0) {
-                fireEvent(player, new QuestEvent.SprintDistance(delta));
-            }
-        }
-    }
-
     /**
      * Fires a {@link QuestEvent} for the amount a vanilla custom stat increased since the last
      * tick this player was seen. Deltas (not a baseline captured at objective-start) are used so
      * neither a relog nor an objective that was already complete before this stat existed ever
-     * misfires a huge one-off jump - the same trick {@link #trackSprintDistance} already uses.
+     * misfires a huge one-off jump.
      */
     private void trackVanillaStatDelta(ServerPlayer player, Map<UUID, Integer> lastSeen,
                                         net.minecraft.stats.Stat<net.minecraft.resources.ResourceLocation> stat,
@@ -142,7 +132,7 @@ public final class QuestManager {
 
     @SubscribeEvent
     public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        lastPositions.remove(event.getEntity().getUUID());
+        lastSprintStat.remove(event.getEntity().getUUID());
         lastJumpStat.remove(event.getEntity().getUUID());
         lastSwimStat.remove(event.getEntity().getUUID());
     }

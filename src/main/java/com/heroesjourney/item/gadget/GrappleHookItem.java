@@ -1,14 +1,17 @@
 package com.heroesjourney.item.gadget;
 
 import com.heroesjourney.config.HJConfig;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -18,11 +21,33 @@ import net.minecraft.world.phys.Vec3;
  * Fires a hook along the player's line of sight; if it lands on a solid block, the player is
  * accelerated toward the hit point (see {@link GrappleHandler}) until they arrive or cancel by
  * sneaking.
+ * <p>
+ * Needs both {@link #use} (nothing in short reach - the common case at typical grapple ranges)
+ * and {@link #useOn} (a block IS within short reach, e.g. firing at a nearby wall or ceiling):
+ * vanilla dispatches right-click to {@code useOn} instead of {@code use} whenever the crosshair
+ * hits a block within normal interaction distance, so relying on {@code use} alone meant the
+ * grapple silently did nothing at close range.
  */
 public class GrappleHookItem extends Item {
 
     public GrappleHookItem(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        Level level = context.getLevel();
+        if (player == null) {
+            return InteractionResult.PASS;
+        }
+        ItemStack stack = context.getItemInHand();
+        if (player.getCooldowns().isOnCooldown(stack.getItem())) {
+            return InteractionResult.FAIL;
+        }
+        BlockPos pos = context.getClickedPos();
+        fireGrapple(level, player, stack, Vec3.atCenterOf(pos));
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     @Override
@@ -41,11 +66,15 @@ public class GrappleHookItem extends Item {
             return InteractionResultHolder.fail(stack);
         }
 
+        fireGrapple(level, player, stack, hit.getLocation());
+        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+    }
+
+    private void fireGrapple(Level level, Player player, ItemStack stack, Vec3 target) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
-            GrappleHandler.startPull(serverPlayer, hit.getLocation());
+            GrappleHandler.startPull(serverPlayer, target);
         }
         player.getCooldowns().addCooldown(stack.getItem(), HJConfig.GRAPPLE_COOLDOWN_TICKS.get());
         level.playSound(null, player.blockPosition(), SoundEvents.TRIDENT_RETURN, SoundSource.PLAYERS, 0.8F, 0.8F);
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 }

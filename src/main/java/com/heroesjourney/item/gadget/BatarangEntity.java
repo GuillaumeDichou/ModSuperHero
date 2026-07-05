@@ -5,22 +5,30 @@ import com.heroesjourney.entity.HJEntities;
 import com.heroesjourney.item.HJItems;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
-/** Thrown batarang: deals a light hit + slows its target, then boomerangs back to the thrower. */
+/**
+ * Thrown batarang: deals a light hit + slows its target, then behaves like a vanilla arrow - if
+ * it doesn't hit anything worth reacting to, it just rests where it landed and can be picked back
+ * up by walking over it, rather than boomeranging back to the thrower.
+ */
 public class BatarangEntity extends ThrowableItemProjectile {
 
-    private static final int MAX_FLIGHT_TICKS = 30;
-    private boolean returning;
+    private static final int MAX_GROUND_LIFETIME_TICKS = 6000;
+
+    private boolean atRest;
+    private int groundTicks;
 
     public BatarangEntity(EntityType<? extends BatarangEntity> type, Level level) {
         super(type, level);
@@ -37,24 +45,10 @@ public class BatarangEntity extends ThrowableItemProjectile {
 
     @Override
     public void tick() {
-        Entity owner = this.getOwner();
-        if (returning && owner != null) {
-            Vec3 toOwner = owner.position().add(0, owner.getEyeHeight() * 0.5, 0).subtract(this.position());
-            if (toOwner.length() < 1.25D) {
-                if (!this.level().isClientSide && owner instanceof net.minecraft.world.entity.player.Player player) {
-                    if (!player.getInventory().add(new net.minecraft.world.item.ItemStack(HJItems.BATARANG.get()))) {
-                        this.spawnAtLocation(new net.minecraft.world.item.ItemStack(HJItems.BATARANG.get()));
-                    }
-                }
-                this.discard();
-                return;
-            }
-            this.setDeltaMovement(toOwner.normalize().scale(1.4D));
-            this.hasImpulse = true;
-        } else if (this.tickCount > MAX_FLIGHT_TICKS) {
-            returning = true;
-        }
         super.tick();
+        if (atRest && ++groundTicks > MAX_GROUND_LIFETIME_TICKS) {
+            this.discard();
+        }
     }
 
     @Override
@@ -70,15 +64,31 @@ public class BatarangEntity extends ThrowableItemProjectile {
                 living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slowDuration, 1));
             }
         }
-        returning = true;
+        settleOnGround();
     }
 
     @Override
     protected void onHitBlock(net.minecraft.world.phys.BlockHitResult result) {
         super.onHitBlock(result);
-        returning = true;
         if (this.level() instanceof ServerLevel serverLevel) {
             serverLevel.sendParticles(ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 5, 0.1, 0.1, 0.1, 0.02);
+        }
+        settleOnGround();
+    }
+
+    private void settleOnGround() {
+        this.setDeltaMovement(Vec3.ZERO);
+        atRest = true;
+    }
+
+    @Override
+    public void playerTouch(Player player) {
+        if (this.level().isClientSide || !atRest) {
+            return;
+        }
+        if (player.getInventory().add(new ItemStack(HJItems.BATARANG.get()))) {
+            this.playSound(SoundEvents.ITEM_PICKUP, 0.2F, ((this.random.nextFloat() - this.random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+            this.discard();
         }
     }
 

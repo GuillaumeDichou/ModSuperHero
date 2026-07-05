@@ -18,17 +18,12 @@
   "item.heroesjourney.grapple_hook": "Grapple Hook",
   "item.heroesjourney.smoke_pebble": "Smoke Pebble",
   "item.heroesjourney.riddle_book": "Riddle Book",
-  "item.heroesjourney.wayne_grave_thomas": "Thomas Wayne's Grave",
-  "item.heroesjourney.wayne_grave_martha": "Martha Wayne's Grave",
-
-  "block.heroesjourney.wayne_grave_thomas": "Thomas Wayne's Grave",
-  "block.heroesjourney.wayne_grave_martha": "Martha Wayne's Grave",
 
   "entity.heroesjourney.batarang": "Batarang",
   "entity.heroesjourney.smoke_pebble": "Smoke Pebble",
 
-  "hero.heroesjourney.batman_nolan": "Batman (Nolan)",
-  "hero.heroesjourney.batman_nolan.description": "Become Gotham's Dark Knight: a vow born of grief, forged through training, investigation, and discipline.",
+  "hero.heroesjourney.batman": "Batman",
+  "hero.heroesjourney.batman.description": "Become Gotham's Dark Knight: a vow born of grief, forged through training, investigation, and discipline.",
 
   "gui.heroesjourney.roster.title": "Heroes",
   "gui.heroesjourney.close": "Close",
@@ -46,30 +41,43 @@
   "gui.heroesjourney.off": "Off",
 
   "gui.heroesjourney.puzzle.title": "Riddle Book",
-  "gui.heroesjourney.puzzle.failed": "That's not it. Try again.",
+  "gui.heroesjourney.puzzle.failed": "Missed. Try again.",
   "gui.heroesjourney.puzzle.submit": "Submit",
-  "gui.heroesjourney.puzzle.memory.instructions": "Reproduce the sequence above, in order.",
-  "gui.heroesjourney.puzzle.cipher.key": "Cipher shift: +%s. Enter the decoded message.",
-  "gui.heroesjourney.puzzle.cipher.answer": "Answer",
+
   "gui.heroesjourney.puzzle.color.red": "Red",
   "gui.heroesjourney.puzzle.color.green": "Green",
   "gui.heroesjourney.puzzle.color.blue": "Blue",
   "gui.heroesjourney.puzzle.color.yellow": "Yellow",
+  "gui.heroesjourney.puzzle.color.purple": "Purple",
+  "gui.heroesjourney.puzzle.color.cyan": "Cyan",
 
-  "quest.heroesjourney.batman.1.title": "The Death of the Parents",
-  "quest.heroesjourney.batman.1.description": "An innocent dies before your eyes, killed by something other than an accident. This day marks the beginning of everything.",
-  "quest.heroesjourney.batman.2.title": "Espionage",
-  "quest.heroesjourney.batman.2.description": "Learn to watch without being seen: approach hostile mobs while staying undetected.",
-  "quest.heroesjourney.batman.3.title": "Physical Training",
-  "quest.heroesjourney.batman.3.description": "Forge your body: running, jumping, and swimming, each at its own pace.",
+  "gui.heroesjourney.puzzle.mastermind.instructions": "Crack the safe: guess the secret combination.",
+  "gui.heroesjourney.puzzle.mastermind.clear": "Clear",
+  "gui.heroesjourney.puzzle.mastermind.incomplete": "Fill the whole combination before submitting.",
+  "gui.heroesjourney.puzzle.mastermind.feedback": "%s exact, %s present but misplaced.",
+  "gui.heroesjourney.puzzle.mastermind.history": "Guess %s: %s exact / %s present",
+
+  "gui.heroesjourney.puzzle.sliding.instructions": "Reassemble the evidence: click two tiles to swap them.",
+
+  "gui.heroesjourney.puzzle.lockpick.instructions": "Pick the lock: click while the cursor is in the green zone.",
+  "gui.heroesjourney.puzzle.lockpick.pick": "Pick",
+  "gui.heroesjourney.puzzle.lockpick.progress": "Pin %s / %s",
+  "gui.heroesjourney.puzzle.lockpick.pin_solved": "Pin %s / %s picked!",
+
+  "quest.heroesjourney.batman.1.title": "The Oath",
+  "quest.heroesjourney.batman.1.description": "That day, an innocent dies before your eyes, victim of a violence nothing could justify. From that loss a vow is born: never again unpunished.",
+  "quest.heroesjourney.batman.2.title": "In the Shadows",
+  "quest.heroesjourney.batman.2.description": "Brute force draws attention. True mastery begins with learning to vanish into the dark, to watch without being seen.",
+  "quest.heroesjourney.batman.3.title": "Body and Discipline",
+  "quest.heroesjourney.batman.3.description": "The body is a weapon that must be forged before anything else. Running, jumping, swimming: every effort brings you closer to what you must become.",
   "quest.heroesjourney.batman.4.title": "Mind",
-  "quest.heroesjourney.batman.4.description": "Sharpen your investigator's mind by solving the riddles in your notebook.",
-  "quest.heroesjourney.batman.5.title": "Martial Arts",
-  "quest.heroesjourney.batman.5.description": "Master hand-to-hand combat against hostile enemies.",
-  "quest.heroesjourney.batman.6.title": "The Bat",
-  "quest.heroesjourney.batman.6.description": "A symbol takes hold of you, carried by nothing more than a bat crossing your path.",
-  "quest.heroesjourney.batman.7.title": "Becoming Batman",
-  "quest.heroesjourney.batman.7.description": "Don the complete Dark Knight suit and become Gotham's legend.",
+  "quest.heroesjourney.batman.4.description": "To stand against criminals, strengthening the body is not enough. The mind must be strengthened too.",
+  "quest.heroesjourney.batman.5.title": "The Fighter",
+  "quest.heroesjourney.batman.5.description": "Bare fists reveal a fighter's true measure. No gadget, no weapon - only the body's discipline against the fear it inspires.",
+  "quest.heroesjourney.batman.6.title": "A Sign in the Night",
+  "quest.heroesjourney.batman.6.description": "A beating of wings in the dark, nothing more. Yet some signs take hold of us without reason - and become symbols.",
+  "quest.heroesjourney.batman.7.title": "Birth of a Legend",
+  "quest.heroesjourney.batman.7.description": "The armour does not make the hero, but it seals the transformation. Tonight, Gotham no longer has a mere vigilante - it has a legend.",
 
   "objective.heroesjourney.batman.witness_death": "Witness an innocent's death",
   "objective.heroesjourney.batman.stealth_approaches": "Sneak up on hostile mobs",
@@ -91,85 +99,5 @@
   "heroesjourney.quest.completed": "Quest complete: %s",
   "heroesjourney.quest.arc_completed": "%s: Arc complete!",
   "heroesjourney.ability.chest_glow.used": "Chest glow activated",
-  "heroesjourney.recipe.locked": "This recipe hasn't been unlocked yet.",
-
-  "puzzle.heroesjourney.riddle.1.question": "A liar always repeats the exact same story, word for word. What gives him away?",
-  "puzzle.heroesjourney.riddle.1.a": "It never varies, not even on insignificant details",
-  "puzzle.heroesjourney.riddle.1.b": "He speaks louder than everyone else",
-  "puzzle.heroesjourney.riddle.1.c": "He keeps looking at the ground",
-
-  "puzzle.heroesjourney.riddle.2.question": "A safe was opened without any sign of forced entry. What should you suspect first?",
-  "puzzle.heroesjourney.riddle.2.a": "Sheer luck",
-  "puzzle.heroesjourney.riddle.2.b": "An accomplice who knew the combination",
-  "puzzle.heroesjourney.riddle.2.c": "A recent earthquake",
-
-  "puzzle.heroesjourney.riddle.3.question": "Two witnesses give different times for the same event. What should you do?",
-  "puzzle.heroesjourney.riddle.3.a": "Automatically believe the older one",
-  "puzzle.heroesjourney.riddle.3.b": "Ignore both accounts",
-  "puzzle.heroesjourney.riddle.3.c": "Check each witness's watch and movements",
-
-  "puzzle.heroesjourney.riddle.4.question": "A criminal always leaves the same symbol at his crime scenes. What does this reveal?",
-  "puzzle.heroesjourney.riddle.4.a": "A need to claim credit for his acts",
-  "puzzle.heroesjourney.riddle.4.b": "A pure coincidence",
-  "puzzle.heroesjourney.riddle.4.c": "A printing error",
-
-  "puzzle.heroesjourney.riddle.5.question": "Why does a burglar carefully avoid nights with a full moon?",
-  "puzzle.heroesjourney.riddle.5.a": "He is superstitious",
-  "puzzle.heroesjourney.riddle.5.b": "Visibility is far too high",
-  "puzzle.heroesjourney.riddle.5.c": "The wind is stronger",
-
-  "puzzle.heroesjourney.riddle.6.question": "What detail most often gives away a hastily fabricated alibi?",
-  "puzzle.heroesjourney.riddle.6.a": "A perfectly calm tone of voice",
-  "puzzle.heroesjourney.riddle.6.b": "Particularly neat handwriting",
-  "puzzle.heroesjourney.riddle.6.c": "Inconsistencies in places and timings",
-
-  "puzzle.heroesjourney.riddle.7.question": "A guard claims to have seen nothing all night. What should you verify first?",
-  "puzzle.heroesjourney.riddle.7.a": "Whether he was actually at his post",
-  "puzzle.heroesjourney.riddle.7.b": "His favourite colour",
-  "puzzle.heroesjourney.riddle.7.c": "His exact age",
-
-  "puzzle.heroesjourney.riddle.8.question": "Why do some criminals return to the scene of their crime?",
-  "puzzle.heroesjourney.riddle.8.a": "Out of sheer boredom",
-  "puzzle.heroesjourney.riddle.8.b": "To make sure no evidence was left behind",
-  "puzzle.heroesjourney.riddle.8.c": "To sleep there",
-
-  "puzzle.heroesjourney.riddle.9.question": "What is the best time to observe a scene without being seen?",
-  "puzzle.heroesjourney.riddle.9.a": "Standing in the middle of the street",
-  "puzzle.heroesjourney.riddle.9.b": "Speaking loudly to draw attention away",
-  "puzzle.heroesjourney.riddle.9.c": "From the heights, in the shadows",
-
-  "puzzle.heroesjourney.riddle.10.question": "A forged document is most often recognised by what?",
-  "puzzle.heroesjourney.riddle.10.a": "Ink or handwriting that doesn't match",
-  "puzzle.heroesjourney.riddle.10.b": "The colour of the paper used",
-  "puzzle.heroesjourney.riddle.10.c": "Its particular smell",
-
-  "puzzle.heroesjourney.riddle.11.question": "Why watch a target's habits closely before acting?",
-  "puzzle.heroesjourney.riddle.11.a": "To pass the time",
-  "puzzle.heroesjourney.riddle.11.b": "To spot a gap in their routine",
-  "puzzle.heroesjourney.riddle.11.c": "It's never actually useful",
-
-  "puzzle.heroesjourney.riddle.12.question": "A suspect has clean hands but fresh paint on his shoes. What should you do?",
-  "puzzle.heroesjourney.riddle.12.a": "Ignore this unimportant detail",
-  "puzzle.heroesjourney.riddle.12.b": "Change the subject immediately",
-  "puzzle.heroesjourney.riddle.12.c": "Check where that paint was recently used",
-
-  "puzzle.heroesjourney.riddle.13.question": "What sign most often betrays a recently used hideout?",
-  "puzzle.heroesjourney.riddle.13.a": "Fresh food or recent footprints",
-  "puzzle.heroesjourney.riddle.13.b": "A thick layer of dust",
-  "puzzle.heroesjourney.riddle.13.c": "Plenty of cobwebs",
-
-  "puzzle.heroesjourney.riddle.14.question": "Why does a good interrogation often start with harmless questions?",
-  "puzzle.heroesjourney.riddle.14.a": "To waste the suspect's time",
-  "puzzle.heroesjourney.riddle.14.b": "To put the suspect at ease before the key questions",
-  "puzzle.heroesjourney.riddle.14.c": "Simply out of politeness",
-
-  "puzzle.heroesjourney.riddle.15.question": "A coded message keeps reusing the same rare symbols. What should you do first?",
-  "puzzle.heroesjourney.riddle.15.a": "Destroy it immediately",
-  "puzzle.heroesjourney.riddle.15.b": "Simply ignore it",
-  "puzzle.heroesjourney.riddle.15.c": "Count how often each symbol appears",
-
-  "puzzle.heroesjourney.riddle.16.question": "Why keep watch on unusual deliveries to an isolated warehouse?",
-  "puzzle.heroesjourney.riddle.16.a": "They may be hiding smuggling",
-  "puzzle.heroesjourney.riddle.16.b": "Out of simple curiosity",
-  "puzzle.heroesjourney.riddle.16.c": "It's never useful to an investigation"
+  "heroesjourney.recipe.locked": "This recipe hasn't been unlocked yet."
 }

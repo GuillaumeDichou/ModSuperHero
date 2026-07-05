@@ -16,11 +16,13 @@ import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.util.FormattedCharSequence;
 
 /**
  * Screen 2: a hero's questline, consultable even when that hero isn't active. Each stage shows
  * done / in-progress-with-counter / locked; there's an "Activate" button (with confirmation) and
- * an optional-HUD-tracker checkbox.
+ * an optional-HUD-tracker checkbox. The current stage additionally shows its narrative flavor
+ * text (see {@link QuestStage#description()}) above its objectives.
  */
 public class HeroDetailScreen extends Screen {
 
@@ -95,15 +97,26 @@ public class HeroDetailScreen extends Screen {
         for (int i = 0; i < stages.size(); i++) {
             QuestStage stage = stages.get(i);
             if (y > this.height - 60 || y < 20) {
-                y += stageHeight(stage, progress, i, currentStage);
+                y += stageHeight(stage, i, currentStage, width);
                 continue;
             }
             y = renderStage(guiGraphics, stage, i, currentStage, progress, left, y, width);
         }
     }
 
-    private int stageHeight(QuestStage stage, HeroProgress progress, int index, int currentStage) {
-        return index > currentStage ? 14 : 14 + stage.objectives().size() * 10;
+    private int stageHeight(QuestStage stage, int index, int currentStage, int width) {
+        if (index > currentStage) {
+            return 14;
+        }
+        int height = 14 + stage.objectives().size() * 10;
+        if (index == currentStage) {
+            height += descriptionLines(stage, width).size() * 10 + 3;
+        }
+        return height;
+    }
+
+    private List<FormattedCharSequence> descriptionLines(QuestStage stage, int width) {
+        return this.font.split(stage.description(), width);
     }
 
     private int renderStage(GuiGraphics g, QuestStage stage, int index, int currentStage, HeroProgress progress, int left, int y, int width) {
@@ -123,6 +136,11 @@ public class HeroDetailScreen extends Screen {
         g.drawString(this.font, line, left, y, index > currentStage ? HJTheme.TEXT_DIM : color, false);
         y += 11;
         if (index == currentStage && progress != null) {
+            for (FormattedCharSequence descLine : descriptionLines(stage, width)) {
+                g.drawString(this.font, descLine, left, y, HJTheme.TEXT_DIM, false);
+                y += 10;
+            }
+            y += 3;
             for (QuestObjective objective : stage.objectives()) {
                 String key = stage.id() + ":" + objective.id();
                 int value = progress.progressFor(key);

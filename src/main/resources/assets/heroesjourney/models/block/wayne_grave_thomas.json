@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "heroesjourney:block/wayne_grave_thomas"
-  }
-}

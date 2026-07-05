@@ -15,7 +15,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 
-/** Thrown smoke pebble: on landing, creates a lingering smoke cloud that blinds and un-targets nearby hostiles. */
+/**
+ * Thrown smoke pebble: on landing, creates a lingering smoke cloud that blinds every entity
+ * inside it - mobs and players alike, including whoever threw it - and un-targets nearby
+ * hostiles.
+ */
 public class SmokePebbleEntity extends ThrowableItemProjectile {
 
     private int cloudTicksRemaining = -1;
@@ -52,9 +56,11 @@ public class SmokePebbleEntity extends ThrowableItemProjectile {
             double radius = HJConfig.SMOKE_PEBBLE_RADIUS.get();
             if (this.tickCount % 5 == 0) {
                 serverLevel.sendParticles(ParticleTypes.LARGE_SMOKE, this.getX(), this.getY() + 0.3, this.getZ(), 6, radius * 0.3, 0.4, radius * 0.3, 0.01);
-                for (Mob mob : serverLevel.getEntitiesOfClass(Mob.class, this.getBoundingBox().inflate(radius))) {
-                    mob.setTarget(null);
-                    mob.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40, 0));
+                for (LivingEntity entity : serverLevel.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius))) {
+                    entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 40, 0));
+                    if (entity instanceof Mob mob) {
+                        mob.setTarget(null);
+                    }
                 }
             }
             cloudTicksRemaining--;

@@ -12,8 +12,8 @@ import net.minecraft.network.chat.Component;
 
 /**
  * Screen 1: the roster. Lists every registered hero with its status (locked / available / active
- * / completed); today that is just Batman Nolan, but the layout is a plain scrolling list so
- * adding more heroes later is purely a content change.
+ * / completed); today that is just Batman, but the layout is a plain scrolling list so adding more
+ * heroes later is purely a content change.
  */
 public class RosterScreen extends Screen {
 

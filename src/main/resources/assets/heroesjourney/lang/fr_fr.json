@@ -18,17 +18,12 @@
   "item.heroesjourney.grapple_hook": "Grappin",
   "item.heroesjourney.smoke_pebble": "Fumigène",
   "item.heroesjourney.riddle_book": "Carnet d'énigmes",
-  "item.heroesjourney.wayne_grave_thomas": "Tombe de Thomas Wayne",
-  "item.heroesjourney.wayne_grave_martha": "Tombe de Martha Wayne",
-
-  "block.heroesjourney.wayne_grave_thomas": "Tombe de Thomas Wayne",
-  "block.heroesjourney.wayne_grave_martha": "Tombe de Martha Wayne",
 
   "entity.heroesjourney.batarang": "Batarang",
   "entity.heroesjourney.smoke_pebble": "Fumigène",
 
-  "hero.heroesjourney.batman_nolan": "Batman (Nolan)",
-  "hero.heroesjourney.batman_nolan.description": "Devenez le Chevalier Noir de Gotham : un serment né d'un deuil, forgé par l'entraînement, l'enquête et la discipline.",
+  "hero.heroesjourney.batman": "Batman",
+  "hero.heroesjourney.batman.description": "Devenez le Chevalier Noir de Gotham : un serment né d'un deuil, forgé par l'entraînement, l'enquête et la discipline.",
 
   "gui.heroesjourney.roster.title": "Héros",
   "gui.heroesjourney.close": "Fermer",
@@ -46,30 +41,43 @@
   "gui.heroesjourney.off": "Désactivé",
 
   "gui.heroesjourney.puzzle.title": "Carnet d'énigmes",
-  "gui.heroesjourney.puzzle.failed": "Ce n'est pas ça. Réessayez.",
+  "gui.heroesjourney.puzzle.failed": "Raté. Réessayez.",
   "gui.heroesjourney.puzzle.submit": "Valider",
-  "gui.heroesjourney.puzzle.memory.instructions": "Reproduisez la séquence ci-dessus, dans l'ordre.",
-  "gui.heroesjourney.puzzle.cipher.key": "Décalage de chiffrement : +%s. Entrez le message en clair.",
-  "gui.heroesjourney.puzzle.cipher.answer": "Réponse",
+
   "gui.heroesjourney.puzzle.color.red": "Rouge",
   "gui.heroesjourney.puzzle.color.green": "Vert",
   "gui.heroesjourney.puzzle.color.blue": "Bleu",
   "gui.heroesjourney.puzzle.color.yellow": "Jaune",
+  "gui.heroesjourney.puzzle.color.purple": "Violet",
+  "gui.heroesjourney.puzzle.color.cyan": "Cyan",
 
-  "quest.heroesjourney.batman.1.title": "La mort des parents",
-  "quest.heroesjourney.batman.1.description": "Un innocent meurt sous vos yeux, tué par autre chose qu'un accident. Ce jour marque le début de tout.",
-  "quest.heroesjourney.batman.2.title": "Espionnage",
-  "quest.heroesjourney.batman.2.description": "Apprenez à observer sans être vu : approchez des mobs hostiles en restant indétectable.",
-  "quest.heroesjourney.batman.3.title": "Physique",
-  "quest.heroesjourney.batman.3.description": "Forgez votre corps : course, saut et natation, chacune à son propre rythme.",
+  "gui.heroesjourney.puzzle.mastermind.instructions": "Déchiffrez le coffre-fort : devinez la combinaison secrète.",
+  "gui.heroesjourney.puzzle.mastermind.clear": "Effacer",
+  "gui.heroesjourney.puzzle.mastermind.incomplete": "Complétez la combinaison avant de valider.",
+  "gui.heroesjourney.puzzle.mastermind.feedback": "%s bien placés, %s présents mais mal placés.",
+  "gui.heroesjourney.puzzle.mastermind.history": "Essai %s : %s bien placés / %s présents",
+
+  "gui.heroesjourney.puzzle.sliding.instructions": "Reconstituez la preuve : cliquez deux tuiles pour les échanger.",
+
+  "gui.heroesjourney.puzzle.lockpick.instructions": "Crochetez la serrure : cliquez quand le curseur est dans la zone verte.",
+  "gui.heroesjourney.puzzle.lockpick.pick": "Crocheter",
+  "gui.heroesjourney.puzzle.lockpick.progress": "Goupille %s / %s",
+  "gui.heroesjourney.puzzle.lockpick.pin_solved": "Goupille %s / %s crochetée !",
+
+  "quest.heroesjourney.batman.1.title": "Le Serment",
+  "quest.heroesjourney.batman.1.description": "Ce jour-là, un innocent meurt sous vos yeux, victime d'une violence que rien ne pouvait justifier. De cette perte naît un serment : plus jamais l'impunité.",
+  "quest.heroesjourney.batman.2.title": "Dans l'ombre",
+  "quest.heroesjourney.batman.2.description": "La force brute attire l'attention. La véritable maîtrise commence par apprendre à disparaître dans l'obscurité, à observer sans être vu.",
+  "quest.heroesjourney.batman.3.title": "Corps et discipline",
+  "quest.heroesjourney.batman.3.description": "Le corps est une arme qu'il faut forger avant tout le reste. Course, saut, natation : chaque effort vous rapproche de ce que vous devez devenir.",
   "quest.heroesjourney.batman.4.title": "Esprit",
-  "quest.heroesjourney.batman.4.description": "Aiguisez votre esprit d'enquêteur en résolvant les énigmes de votre carnet.",
-  "quest.heroesjourney.batman.5.title": "Arts martiaux",
-  "quest.heroesjourney.batman.5.description": "Maîtrisez le combat à mains nues face à des ennemis hostiles.",
-  "quest.heroesjourney.batman.6.title": "La chauve-souris",
-  "quest.heroesjourney.batman.6.description": "Un symbole s'impose à vous, porté par une simple chauve-souris croisant votre chemin.",
-  "quest.heroesjourney.batman.7.title": "Devenir Batman",
-  "quest.heroesjourney.batman.7.description": "Revêtez l'armure complète du Chevalier Noir et devenez la légende de Gotham.",
+  "quest.heroesjourney.batman.4.description": "Pour faire face aux criminels, il ne suffit pas de renforcer son corps. Il faut aussi renforcer son esprit.",
+  "quest.heroesjourney.batman.5.title": "Le Combattant",
+  "quest.heroesjourney.batman.5.description": "Les poings nus révèlent la vraie mesure d'un combattant. Nul gadget, nulle arme : seulement la discipline du corps face à la peur qu'il inspire.",
+  "quest.heroesjourney.batman.6.title": "Un signe dans la nuit",
+  "quest.heroesjourney.batman.6.description": "Un battement d'ailes dans l'obscurité, rien de plus. Mais certains signes s'imposent à nous sans que l'on sache pourquoi - et deviennent des symboles.",
+  "quest.heroesjourney.batman.7.title": "Naissance d'une légende",
+  "quest.heroesjourney.batman.7.description": "L'armure ne fait pas le héros, mais elle scelle la transformation. Ce soir, Gotham cesse d'avoir un simple justicier : elle a une légende.",
 
   "objective.heroesjourney.batman.witness_death": "Assister à la mort d'un innocent",
   "objective.heroesjourney.batman.stealth_approaches": "Approcher furtivement des mobs hostiles",
@@ -91,85 +99,5 @@
   "heroesjourney.quest.completed": "Quête terminée : %s",
   "heroesjourney.quest.arc_completed": "%s : Arc terminé !",
   "heroesjourney.ability.chest_glow.used": "Lueur des coffres activée",
-  "heroesjourney.recipe.locked": "Cette recette n'est pas encore débloquée.",
-
-  "puzzle.heroesjourney.riddle.1.question": "Un menteur répète toujours la même histoire mot pour mot. Quel indice le trahit ?",
-  "puzzle.heroesjourney.riddle.1.a": "Il ne varie jamais, même sur les détails insignifiants",
-  "puzzle.heroesjourney.riddle.1.b": "Il parle plus fort que les autres",
-  "puzzle.heroesjourney.riddle.1.c": "Il regarde le sol en permanence",
-
-  "puzzle.heroesjourney.riddle.2.question": "Un coffre-fort a été ouvert sans la moindre trace d'effraction. Que soupçonner en premier ?",
-  "puzzle.heroesjourney.riddle.2.a": "Un simple coup de chance",
-  "puzzle.heroesjourney.riddle.2.b": "Un complice connaissant la combinaison",
-  "puzzle.heroesjourney.riddle.2.c": "Un tremblement de terre récent",
-
-  "puzzle.heroesjourney.riddle.3.question": "Deux témoins donnent des heures différentes pour le même événement. Que faire ?",
-  "puzzle.heroesjourney.riddle.3.a": "Croire automatiquement le plus âgé",
-  "puzzle.heroesjourney.riddle.3.b": "Ignorer les deux témoignages",
-  "puzzle.heroesjourney.riddle.3.c": "Vérifier chaque montre et chaque déplacement",
-
-  "puzzle.heroesjourney.riddle.4.question": "Un criminel laisse toujours le même symbole sur ses scènes de crime. Que révèle ce détail ?",
-  "puzzle.heroesjourney.riddle.4.a": "Un besoin de revendiquer ses actes",
-  "puzzle.heroesjourney.riddle.4.b": "Une simple coïncidence",
-  "puzzle.heroesjourney.riddle.4.c": "Une erreur d'impression",
-
-  "puzzle.heroesjourney.riddle.5.question": "Pourquoi un cambrioleur évite-t-il soigneusement les nuits de pleine lune ?",
-  "puzzle.heroesjourney.riddle.5.a": "Il est superstitieux",
-  "puzzle.heroesjourney.riddle.5.b": "La visibilité y est trop grande",
-  "puzzle.heroesjourney.riddle.5.c": "Le vent y est plus fort",
-
-  "puzzle.heroesjourney.riddle.6.question": "Quel détail trahit le plus souvent un alibi fabriqué à la hâte ?",
-  "puzzle.heroesjourney.riddle.6.a": "Un ton de voix parfaitement calme",
-  "puzzle.heroesjourney.riddle.6.b": "Une écriture particulièrement soignée",
-  "puzzle.heroesjourney.riddle.6.c": "Des incohérences de lieux et d'horaires",
-
-  "puzzle.heroesjourney.riddle.7.question": "Un garde affirme n'avoir rien vu de toute la nuit. Que vérifier en priorité ?",
-  "puzzle.heroesjourney.riddle.7.a": "S'il était réellement à son poste",
-  "puzzle.heroesjourney.riddle.7.b": "Sa couleur préférée",
-  "puzzle.heroesjourney.riddle.7.c": "Son âge exact",
-
-  "puzzle.heroesjourney.riddle.8.question": "Pourquoi certains criminels reviennent-ils sur les lieux de leur crime ?",
-  "puzzle.heroesjourney.riddle.8.a": "Par simple ennui",
-  "puzzle.heroesjourney.riddle.8.b": "Pour vérifier qu'aucune preuve n'a été oubliée",
-  "puzzle.heroesjourney.riddle.8.c": "Pour y dormir",
-
-  "puzzle.heroesjourney.riddle.9.question": "Quel est le meilleur moment pour observer une scène sans être vu ?",
-  "puzzle.heroesjourney.riddle.9.a": "En plein milieu de la rue",
-  "puzzle.heroesjourney.riddle.9.b": "En parlant fort pour détourner l'attention",
-  "puzzle.heroesjourney.riddle.9.c": "Depuis les hauteurs, dans l'ombre",
-
-  "puzzle.heroesjourney.riddle.10.question": "Un document falsifié se reconnaît le plus souvent à quoi ?",
-  "puzzle.heroesjourney.riddle.10.a": "Une encre ou une écriture qui ne correspond pas",
-  "puzzle.heroesjourney.riddle.10.b": "La couleur du papier utilisé",
-  "puzzle.heroesjourney.riddle.10.c": "Son odeur particulière",
-
-  "puzzle.heroesjourney.riddle.11.question": "Pourquoi observer longuement les habitudes d'une cible avant d'agir ?",
-  "puzzle.heroesjourney.riddle.11.a": "Pour passer le temps",
-  "puzzle.heroesjourney.riddle.11.b": "Pour repérer une faille dans sa routine",
-  "puzzle.heroesjourney.riddle.11.c": "Ce n'est jamais réellement utile",
-
-  "puzzle.heroesjourney.riddle.12.question": "Un suspect a les mains propres mais de la peinture fraîche sur ses chaussures. Que faire ?",
-  "puzzle.heroesjourney.riddle.12.a": "Ignorer ce détail sans importance",
-  "puzzle.heroesjourney.riddle.12.b": "Changer immédiatement de sujet",
-  "puzzle.heroesjourney.riddle.12.c": "Vérifier où cette peinture a été utilisée récemment",
-
-  "puzzle.heroesjourney.riddle.13.question": "Quel signe trahit le plus souvent une planque récemment utilisée ?",
-  "puzzle.heroesjourney.riddle.13.a": "De la nourriture fraîche ou des traces de pas récentes",
-  "puzzle.heroesjourney.riddle.13.b": "Une épaisse couche de poussière",
-  "puzzle.heroesjourney.riddle.13.c": "De nombreuses toiles d'araignée",
-
-  "puzzle.heroesjourney.riddle.14.question": "Pourquoi un bon interrogatoire commence-t-il souvent par des questions anodines ?",
-  "puzzle.heroesjourney.riddle.14.a": "Pour faire perdre du temps au suspect",
-  "puzzle.heroesjourney.riddle.14.b": "Pour mettre le suspect en confiance avant les questions clés",
-  "puzzle.heroesjourney.riddle.14.c": "Par simple politesse",
-
-  "puzzle.heroesjourney.riddle.15.question": "Un message codé réutilise toujours les mêmes symboles rares. Que faire en premier ?",
-  "puzzle.heroesjourney.riddle.15.a": "Le détruire immédiatement",
-  "puzzle.heroesjourney.riddle.15.b": "L'ignorer purement et simplement",
-  "puzzle.heroesjourney.riddle.15.c": "Compter la fréquence de chaque symbole",
-
-  "puzzle.heroesjourney.riddle.16.question": "Pourquoi surveiller des livraisons inhabituelles vers un entrepôt isolé ?",
-  "puzzle.heroesjourney.riddle.16.a": "Elles peuvent dissimuler un trafic",
-  "puzzle.heroesjourney.riddle.16.b": "Par simple curiosité",
-  "puzzle.heroesjourney.riddle.16.c": "Ce n'est jamais utile à une enquête"
+  "heroesjourney.recipe.locked": "Cette recette n'est pas encore débloquée."
 }
