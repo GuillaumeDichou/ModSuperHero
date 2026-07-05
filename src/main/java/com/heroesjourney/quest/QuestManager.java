@@ -4,43 +4,37 @@ import com.heroesjourney.ability.AbilityRegistry;
 import com.heroesjourney.data.HJAttachments;
 import com.heroesjourney.data.HeroData;
 import com.heroesjourney.data.HeroProgress;
-import com.heroesjourney.dialogue.DialogueChoiceDef;
-import com.heroesjourney.dialogue.DialogueNode;
-import com.heroesjourney.dialogue.DialogueRegistry;
-import com.heroesjourney.dialogue.DialogueTree;
-import com.heroesjourney.dialogue.DialogueView;
-import com.heroesjourney.dialogue.NpcDefinition;
-import com.heroesjourney.dialogue.DialogueChoiceView;
 import com.heroesjourney.effects.HeroEffectsService;
-import com.heroesjourney.entity.npc.QuestNpcEntity;
 import com.heroesjourney.hero.HeroDefinition;
 import com.heroesjourney.hero.HeroRegistry;
 import com.heroesjourney.network.HJNetworking;
-import com.heroesjourney.network.OpenDialoguePayload;
 import com.heroesjourney.quest.event.QuestEvent;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundSetActionBarTextPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
  * The generic quest engine: dispatches {@link QuestEvent}s to the active objective of whichever
  * hero a player currently has active, applies rewards/hooks on stage completion, and owns hero
- * switching (activation) and dialogue flow. Nothing in this class knows anything about Batman
- * specifically - all of that lives in {@code content.batman}.
+ * switching (activation). Nothing in this class knows anything about Batman specifically - all of
+ * that lives in {@code content.batman}.
  */
 public final class QuestManager {
 
@@ -48,7 +42,9 @@ public final class QuestManager {
 
     private static final int HEARTBEAT_INTERVAL_TICKS = 20;
 
-    private final java.util.Map<java.util.UUID, net.minecraft.world.phys.Vec3> lastPositions = new java.util.HashMap<>();
+    private final Map<UUID, net.minecraft.world.phys.Vec3> lastPositions = new HashMap<>();
+    private final Map<UUID, Integer> lastJumpStat = new HashMap<>();
+    private final Map<UUID, Integer> lastSwimStat = new HashMap<>();
 
     private QuestManager() {
     }
@@ -66,6 +62,10 @@ public final class QuestManager {
             fireEvent(player, new QuestEvent.Heartbeat());
         }
         trackSprintDistance(player);
+        trackVanillaStatDelta(player, lastJumpStat, Stats.CUSTOM.get(Stats.JUMP),
+                delta -> new QuestEvent.PlayerJumped(delta));
+        trackVanillaStatDelta(player, lastSwimStat, Stats.CUSTOM.get(Stats.SWIM_ONE_CM),
+                delta -> new QuestEvent.SwimDistance(delta / 100.0));
         HeroEffectsService.tick(player);
     }
 
@@ -85,31 +85,66 @@ public final class QuestManager {
         }
     }
 
-    @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        if (!(event.getSource().getEntity() instanceof ServerPlayer player)) {
-            return;
+    /**
+     * Fires a {@link QuestEvent} for the amount a vanilla custom stat increased since the last
+     * tick this player was seen. Deltas (not a baseline captured at objective-start) are used so
+     * neither a relog nor an objective that was already complete before this stat existed ever
+     * misfires a huge one-off jump - the same trick {@link #trackSprintDistance} already uses.
+     */
+    private void trackVanillaStatDelta(ServerPlayer player, Map<UUID, Integer> lastSeen,
+                                        net.minecraft.stats.Stat<net.minecraft.resources.ResourceLocation> stat,
+                                        java.util.function.Function<Integer, QuestEvent> eventFactory) {
+        int current = player.getStats().getValue(stat);
+        Integer last = lastSeen.put(player.getUUID(), current);
+        if (last != null && current > last) {
+            fireEvent(player, eventFactory.apply(current - last));
         }
-        LivingEntity victim = event.getEntity();
-        boolean bareHanded = player.getMainHandItem().isEmpty();
-        boolean sneakAttack = player.isShiftKeyDown() && (!(victim instanceof Mob mob) || mob.getTarget() == null);
-        String typeId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType()).toString();
-        fireEvent(player, new QuestEvent.MobKilled(typeId, bareHanded, sneakAttack, true));
     }
 
     @SubscribeEvent
-    public void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
-        if (!(event.getEntity() instanceof ServerPlayer player)) {
+    public void onLivingDeath(LivingDeathEvent event) {
+        LivingEntity victim = event.getEntity();
+        if (event.getSource().getEntity() instanceof ServerPlayer player) {
+            boolean bareHanded = player.getMainHandItem().isEmpty();
+            boolean sneakAttack = player.isShiftKeyDown() && (!(victim instanceof Mob mob) || mob.getTarget() == null);
+            String typeId = net.minecraft.core.registries.BuiltInRegistries.ENTITY_TYPE.getKey(victim.getType()).toString();
+            fireEvent(player, new QuestEvent.MobKilled(typeId, bareHanded, sneakAttack, true));
             return;
         }
-        if (event.getTarget() instanceof QuestNpcEntity npc) {
-            openDialogueWith(player, npc);
+        onNonPlayerDeath(event, victim);
+    }
+
+    /**
+     * Quest-1's trigger: a villager dies to a mob (never the player, a fall, fire/lava, or
+     * drowning - none of those have a {@link LivingEntity} as the damage source's entity, so that
+     * single check covers every exclusion the design calls for) while a Batman-hero player is
+     * nearby to witness it.
+     */
+    private void onNonPlayerDeath(LivingDeathEvent event, LivingEntity victim) {
+        if (!(victim instanceof Villager)) {
+            return;
+        }
+        DamageSource source = event.getSource();
+        if (!(source.getEntity() instanceof LivingEntity attacker) || attacker instanceof Player) {
+            return;
+        }
+        if (!(victim.level() instanceof ServerLevel level)) {
+            return;
+        }
+        int radius = com.heroesjourney.config.HJConfig.ORIGIN_VILLAGER_WITNESS_RADIUS.get();
+        net.minecraft.core.BlockPos pos = victim.blockPosition();
+        for (ServerPlayer nearby : level.players()) {
+            if (nearby.blockPosition().closerThan(pos, radius)) {
+                fireEvent(nearby, new QuestEvent.InnocentKilledNearby());
+            }
         }
     }
 
     @SubscribeEvent
     public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
         lastPositions.remove(event.getEntity().getUUID());
+        lastJumpStat.remove(event.getEntity().getUUID());
+        lastSwimStat.remove(event.getEntity().getUUID());
     }
 
     @SubscribeEvent
@@ -118,7 +153,7 @@ public final class QuestManager {
             HeroData data = player.getData(HJAttachments.HERO_DATA);
             if (data.hasActiveHero()) {
                 HeroProgress progress = data.getOrCreateProgress(data.activeHero());
-                com.heroesjourney.effects.HeroEffectsService.applyImmediate(player, data.activeHero(), progress);
+                HeroEffectsService.applyImmediate(player, data.activeHero(), progress);
             }
             HJNetworking.syncHeroData(player);
         }
@@ -227,78 +262,6 @@ public final class QuestManager {
     }
 
     // -------------------------------------------------------------------
-    // Dialogue
-    // -------------------------------------------------------------------
-
-    public void openDialogueWith(ServerPlayer player, QuestNpcEntity npc) {
-        Optional<NpcDefinition> defOpt = DialogueRegistry.npc(npc.getNpcId());
-        if (defOpt.isEmpty()) {
-            return;
-        }
-        NpcDefinition def = defOpt.get();
-        HeroData data = player.getData(HJAttachments.HERO_DATA);
-        if (!def.requiredHeroId().equals(HeroRegistry.NONE) && !def.requiredHeroId().equals(data.activeHero())) {
-            sendNeutralLine(player, npc, def);
-            return;
-        }
-        fireEvent(player, new QuestEvent.NpcInteracted(def.id()));
-        Optional<DialogueTree> treeOpt = DialogueRegistry.tree(def.dialogueTreeId());
-        if (treeOpt.isEmpty()) {
-            return;
-        }
-        HeroProgress progress = data.getProgress(data.activeHero());
-        sendNode(player, npc, def, treeOpt.get(), treeOpt.get().resolveStart(progress));
-    }
-
-    public void handleDialogueChoice(ServerPlayer player, int npcEntityId, String choiceId) {
-        Entity entity = player.serverLevel().getEntity(npcEntityId);
-        if (!(entity instanceof QuestNpcEntity npc)) {
-            return;
-        }
-        Optional<NpcDefinition> defOpt = DialogueRegistry.npc(npc.getNpcId());
-        if (defOpt.isEmpty()) {
-            return;
-        }
-        NpcDefinition def = defOpt.get();
-        Optional<DialogueTree> treeOpt = DialogueRegistry.tree(def.dialogueTreeId());
-        if (treeOpt.isEmpty()) {
-            return;
-        }
-        DialogueTree tree = treeOpt.get();
-        // Search every node for the matching choice id (nodes are small in number; fine to scan).
-        for (DialogueNode node : tree.nodes().values()) {
-            for (DialogueChoiceDef choice : node.choices()) {
-                if (choice.id().equals(choiceId)) {
-                    choice.onSelect().apply(player, player.serverLevel(), npc);
-                    fireEvent(player, new QuestEvent.DialogueChoiceMade(def.id(), choiceId));
-                    if (choice.nextNodeId() == null) {
-                        return;
-                    }
-                    DialogueNode next = tree.node(choice.nextNodeId()).orElse(null);
-                    if (next != null) {
-                        sendNode(player, npc, def, tree, next);
-                    }
-                    return;
-                }
-            }
-        }
-    }
-
-    private void sendNode(ServerPlayer player, QuestNpcEntity npc, NpcDefinition def, DialogueTree tree, DialogueNode node) {
-        List<DialogueChoiceView> choices = new ArrayList<>();
-        for (DialogueChoiceDef choice : node.choices()) {
-            choices.add(new DialogueChoiceView(choice.id(), choice.label()));
-        }
-        DialogueView view = new DialogueView(npc.getId(), def.id(), node.id(), def.displayName(), def.texture(), node.text(), choices);
-        HJNetworking.sendToPlayer(player, OpenDialoguePayload.of(view));
-    }
-
-    private void sendNeutralLine(ServerPlayer player, QuestNpcEntity npc, NpcDefinition def) {
-        DialogueView view = new DialogueView(npc.getId(), def.id(), "neutral", def.displayName(), def.texture(), def.neutralLine(), List.of());
-        HJNetworking.sendToPlayer(player, OpenDialoguePayload.of(view));
-    }
-
-    // -------------------------------------------------------------------
     // Abilities
     // -------------------------------------------------------------------
 
@@ -321,7 +284,7 @@ public final class QuestManager {
         });
     }
 
-    public void fireBossDefeated(ServerPlayer player, String bossId) {
-        fireEvent(player, new QuestEvent.BossDefeated(bossId));
+    public void firePuzzleSolved(ServerPlayer player) {
+        fireEvent(player, new QuestEvent.PuzzleSolved());
     }
 }

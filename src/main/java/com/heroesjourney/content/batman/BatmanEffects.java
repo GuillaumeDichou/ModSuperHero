@@ -15,11 +15,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
 /**
- * Batman Nolan's {@link HeroEffectsProvider}: grants/refreshes/removes the passive effects
- * described in the design doc. Short-lived potion effects (night vision, the quest-4 speed &
- * resistance) are refreshed roughly once a second while active and simply fade out within a few
- * seconds of switching away - a deliberate simplification over frame-perfect instant removal (see
- * README). The unarmed attack-speed bonus is a real, instantly added/removed attribute modifier.
+ * Batman Nolan's {@link HeroEffectsProvider}: grants/refreshes/removes the passive effects earned
+ * across the "Origine" questline, plus the suit's own intrinsic effects (night vision, boots
+ * speed). Short-lived potion effects are refreshed roughly once a second while active and simply
+ * fade out within a few seconds of switching away - a deliberate simplification over frame-perfect
+ * instant removal (see README). The unarmed attack-speed bonus is a real, instantly added/removed
+ * attribute modifier.
  */
 public final class BatmanEffects implements HeroEffectsProvider {
 
@@ -28,7 +29,7 @@ public final class BatmanEffects implements HeroEffectsProvider {
 
     @Override
     public void applyImmediate(ServerPlayer player, HeroProgress progress) {
-        if (progress.hasFlag(BatmanAbilities.FLAG_KEN_DEFEATED)) {
+        if (progress.hasFlag(BatmanAbilities.FLAG_MARTIAL_ARTS_TRAINED)) {
             addAttackSpeedModifier(player);
         }
     }
@@ -46,9 +47,16 @@ public final class BatmanEffects implements HeroEffectsProvider {
         if (player.getItemBySlot(EquipmentSlot.FEET).is(HJItems.BAT_BOOTS.get())) {
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30, 0, true, false, false));
         }
-        if (progress.hasFlag(BatmanAbilities.FLAG_KEN_DEFEATED)) {
-            player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 30, HJConfig.PASSIVE_RESISTANCE_LEVEL.get(), true, false, false));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30, HJConfig.PASSIVE_SPEED_LEVEL.get(), true, false, false));
+        // Quest 3a reward: light passive sprint speed bonus.
+        if (progress.hasFlag(BatmanAbilities.FLAG_RUN_TRAINED)) {
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 30, HJConfig.RUN_TRAINING_SPEED_LEVEL.get(), true, false, false));
+        }
+        // Quest 3c reward: swim speed bonus.
+        if (progress.hasFlag(BatmanAbilities.FLAG_SWIM_TRAINED)) {
+            player.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 30, 0, true, false, false));
+        }
+        // Quest 5 reward: bare-handed attack speed bonus (damage bonus itself is BatmanCombatHandler).
+        if (progress.hasFlag(BatmanAbilities.FLAG_MARTIAL_ARTS_TRAINED)) {
             addAttackSpeedModifier(player);
         }
     }

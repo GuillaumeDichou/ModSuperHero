@@ -23,12 +23,12 @@ public final class HJNetworking {
 
         registrar.playToServer(ActivateHeroPayload.TYPE, ActivateHeroPayload.STREAM_CODEC, ServerPayloadHandler::handleActivateHero);
         registrar.playToServer(SetHudTrackerPayload.TYPE, SetHudTrackerPayload.STREAM_CODEC, ServerPayloadHandler::handleSetHudTracker);
-        registrar.playToServer(DialogueChoicePayload.TYPE, DialogueChoicePayload.STREAM_CODEC, ServerPayloadHandler::handleDialogueChoice);
         registrar.playToServer(UseAbilityPayload.TYPE, UseAbilityPayload.STREAM_CODEC, ServerPayloadHandler::handleUseAbility);
+        registrar.playToServer(PuzzleSolvedPayload.TYPE, PuzzleSolvedPayload.STREAM_CODEC, ServerPayloadHandler::handlePuzzleSolved);
 
         if (FMLEnvironment.dist.isClient()) {
             registrar.playToClient(SyncHeroDataPayload.TYPE, SyncHeroDataPayload.STREAM_CODEC, ClientPayloadHandler::handleSyncHeroData);
-            registrar.playToClient(OpenDialoguePayload.TYPE, OpenDialoguePayload.STREAM_CODEC, ClientPayloadHandler::handleOpenDialogue);
+            registrar.playToClient(OpenPuzzlePayload.TYPE, OpenPuzzlePayload.STREAM_CODEC, ClientPayloadHandler::handleOpenPuzzle);
         }
     }
 

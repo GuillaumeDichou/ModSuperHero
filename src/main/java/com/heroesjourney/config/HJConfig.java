@@ -4,76 +4,118 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
  * Central balancing config for Hero's Journey. Every tunable value used by the generic engine
- * or by the Batman Begins content lives here so designers can rebalance without recompiling.
+ * or by the Batman "Origine" content lives here so designers can rebalance without recompiling.
  * <p>
- * Structure rarity/biome placement is controlled by the datapack worldgen JSON files under
+ * Wayne Manor's rarity/biome placement is controlled by the datapack worldgen JSON files under
  * {@code data/heroesjourney/worldgen/structure_set/*.json} (spacing/separation) rather than this
- * TOML config, because vanilla structure placement is only reloadable through datapacks - see
- * the comment at the top of each structure_set file for the values that mirror the table in the
- * design document.
+ * TOML config, because vanilla structure placement is only reloadable through datapacks.
  */
 public class HJConfig {
 
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     // ---------------------------------------------------------------------
-    // Quest 3 - League of Shadows training thresholds
+    // Quest 1 - "La mort des parents"
     // ---------------------------------------------------------------------
-    public static final ModConfigSpec.IntValue TRAINING_BAREHANDED_KILLS = BUILDER
-            .comment("Nombre de mobs hostiles a vaincre a mains nues pour l'entrainement de la Ligue des Ombres.")
-            .defineInRange("questBatman.training.barehandedKills", 30, 1, 10000);
+    public static final ModConfigSpec.IntValue ORIGIN_VILLAGER_WITNESS_RADIUS = BUILDER
+            .comment("Rayon (blocs) dans lequel le joueur doit se trouver pour 'assister' a la mort d'un villageois tue par un mob.")
+            .defineInRange("questBatman.origin.villagerWitnessRadius", 18, 1, 128);
 
-    public static final ModConfigSpec.IntValue TRAINING_RUN_DISTANCE = BUILDER
-            .comment("Distance (en blocs, en sprint) a parcourir pour l'entrainement.")
+    // ---------------------------------------------------------------------
+    // Quest 2 - "Espionnage"
+    // ---------------------------------------------------------------------
+    public static final ModConfigSpec.IntValue STEALTH_APPROACH_COUNT = BUILDER
+            .comment("Nombre d'approches furtives distinctes requises.")
+            .defineInRange("questBatman.stealth.approachCount", 15, 1, 1000);
+
+    public static final ModConfigSpec.DoubleValue STEALTH_APPROACH_RADIUS = BUILDER
+            .comment("Distance maximale (blocs) au mob hostile pour qu'une approche furtive compte.")
+            .defineInRange("questBatman.stealth.approachRadius", 6.0, 1.0, 32.0);
+
+    public static final ModConfigSpec.IntValue STEALTH_APPROACH_CONSECUTIVE_SECONDS = BUILDER
+            .comment("Duree (secondes) pendant laquelle l'approche doit rester valide (sneak, distance, mob sans cible) avant de compter.")
+            .defineInRange("questBatman.stealth.consecutiveSeconds", 3, 1, 60);
+
+    // ---------------------------------------------------------------------
+    // Quest 3 - "Physique" (3 sous-categories independantes)
+    // ---------------------------------------------------------------------
+    public static final ModConfigSpec.IntValue RUN_TRAINING_DISTANCE = BUILDER
+            .comment("Distance (blocs, en sprint) a parcourir pour l'entrainement 'course'.")
             .defineInRange("questBatman.training.runDistanceBlocks", 3000, 1, 1000000);
 
-    public static final ModConfigSpec.IntValue TRAINING_SNEAK_ATTACKS = BUILDER
-            .comment("Nombre de sneak-attacks (attaque surprise sur un mob qui n'a pas detecte le joueur) requis.")
-            .defineInRange("questBatman.training.sneakAttacks", 15, 1, 10000);
+    public static final ModConfigSpec.IntValue JUMP_TRAINING_COUNT = BUILDER
+            .comment("Nombre de sauts a effectuer pour l'entrainement 'saut'.")
+            .defineInRange("questBatman.training.jumpCount", 500, 1, 1000000);
+
+    public static final ModConfigSpec.IntValue SWIM_TRAINING_DISTANCE = BUILDER
+            .comment("Distance (blocs, a la nage) a parcourir pour l'entrainement 'nage'.")
+            .defineInRange("questBatman.training.swimDistanceBlocks", 500, 1, 1000000);
+
+    public static final ModConfigSpec.IntValue RUN_TRAINING_SPEED_LEVEL = BUILDER
+            .comment("Niveau (0 = niveau I) de Vitesse permanente accordee par l'entrainement 'course'.")
+            .defineInRange("questBatman.training.runSpeedAmplifier", 0, 0, 4);
+
+    public static final ModConfigSpec.DoubleValue JUMP_TRAINING_FALL_DAMAGE_REDUCTION = BUILDER
+            .comment("Reduction des degats de chute (0.3 = -30%) accordee par l'entrainement 'saut'. Se cumule avec celle des jambieres.")
+            .defineInRange("questBatman.training.jumpFallDamageReduction", 0.3, 0.0, 1.0);
 
     // ---------------------------------------------------------------------
-    // Detective sense ability (quest 2 reward)
+    // Quest 4 - "Esprit / enquete" (carnet d'enigmes)
     // ---------------------------------------------------------------------
-    public static final ModConfigSpec.IntValue DETECTIVE_SENSE_RADIUS = BUILDER
-            .comment("Rayon (en blocs) dans lequel le Sens du Detective revele les coffres.")
-            .defineInRange("questBatman.detectiveSense.radius", 20, 1, 128);
+    public static final ModConfigSpec.IntValue PUZZLE_TARGET_COUNT = BUILDER
+            .comment("Nombre d'enigmes a resoudre pour valider la quete.")
+            .defineInRange("questBatman.puzzle.targetCount", 10, 1, 1000);
 
-    public static final ModConfigSpec.IntValue DETECTIVE_SENSE_DURATION_TICKS = BUILDER
-            .comment("Duree (en ticks) de l'effet du Sens du Detective. 20 ticks = 1 seconde.")
-            .defineInRange("questBatman.detectiveSense.durationTicks", 100, 20, 2000);
+    public static final ModConfigSpec.IntValue PUZZLE_MEMORY_LENGTH = BUILDER
+            .comment("Longueur de la sequence pour le mini-jeu 'memoire'.")
+            .defineInRange("questBatman.puzzle.memoryLength", 4, 2, 12);
 
-    public static final ModConfigSpec.IntValue DETECTIVE_SENSE_COOLDOWN_TICKS = BUILDER
-            .comment("Cooldown (en ticks) du Sens du Detective.")
-            .defineInRange("questBatman.detectiveSense.cooldownTicks", 600, 20, 100000);
+    public static final ModConfigSpec.IntValue CHEST_GLOW_RADIUS = BUILDER
+            .comment("Rayon (blocs) dans lequel la capacite 'lueur des coffres' revele les coffres.")
+            .defineInRange("questBatman.chestGlow.radius", 20, 1, 128);
+
+    public static final ModConfigSpec.IntValue CHEST_GLOW_DURATION_TICKS = BUILDER
+            .comment("Duree (ticks) de l'effet de la capacite 'lueur des coffres'. 20 ticks = 1 seconde.")
+            .defineInRange("questBatman.chestGlow.durationTicks", 100, 20, 2000);
+
+    public static final ModConfigSpec.IntValue CHEST_GLOW_COOLDOWN_TICKS = BUILDER
+            .comment("Cooldown (ticks) de la capacite 'lueur des coffres'.")
+            .defineInRange("questBatman.chestGlow.cooldownTicks", 600, 20, 100000);
 
     // ---------------------------------------------------------------------
-    // Quest 4 passive rewards (Ken defeated)
+    // Quest 5 - "Arts martiaux"
     // ---------------------------------------------------------------------
+    public static final ModConfigSpec.IntValue MARTIAL_ARTS_KILLS = BUILDER
+            .comment("Nombre de mobs hostiles a vaincre a mains nues (coup fatal) pour valider la quete.")
+            .defineInRange("questBatman.martialArts.kills", 40, 1, 10000);
+
     public static final ModConfigSpec.DoubleValue UNARMED_DAMAGE_BONUS = BUILDER
-            .comment("Bonus additif aux degats a mains nues pour Batman Nolan actif.")
-            .defineInRange("questBatman.passives.unarmedDamageBonus", 2.0, 0.0, 20.0);
+            .comment("Bonus additif aux degats a mains nues pour Batman Nolan actif, une fois l'entrainement aux arts martiaux valide.")
+            .defineInRange("questBatman.martialArts.unarmedDamageBonus", 2.0, 0.0, 20.0);
 
     public static final ModConfigSpec.DoubleValue UNARMED_ATTACK_SPEED_BONUS = BUILDER
             .comment("Bonus additif a la vitesse d'attaque a mains nues.")
-            .defineInRange("questBatman.passives.unarmedAttackSpeedBonus", 1.0, 0.0, 10.0);
+            .defineInRange("questBatman.martialArts.unarmedAttackSpeedBonus", 1.0, 0.0, 10.0);
 
+    // ---------------------------------------------------------------------
+    // Quest 2 reward - mob detection reduction
+    // ---------------------------------------------------------------------
     public static final ModConfigSpec.DoubleValue MOB_DETECTION_RANGE_MULTIPLIER = BUILDER
             .comment("Multiplicateur applique au rayon de detection des mobs hostiles envers le joueur (0.7 = -30%).")
-            .defineInRange("questBatman.passives.mobDetectionRangeMultiplier", 0.7, 0.1, 1.0);
-
-    public static final ModConfigSpec.IntValue PASSIVE_RESISTANCE_LEVEL = BUILDER
-            .comment("Niveau (0 = niveau I) de Resistance permanente accordee.")
-            .defineInRange("questBatman.passives.resistanceAmplifier", 0, 0, 4);
-
-    public static final ModConfigSpec.IntValue PASSIVE_SPEED_LEVEL = BUILDER
-            .comment("Niveau (0 = niveau I) de Vitesse permanente accordee.")
-            .defineInRange("questBatman.passives.speedAmplifier", 0, 0, 4);
+            .defineInRange("questBatman.stealth.mobDetectionRangeMultiplier", 0.7, 0.1, 1.0);
 
     // ---------------------------------------------------------------------
-    // Armor effects
+    // Quest 6 - "La chauve-souris"
+    // ---------------------------------------------------------------------
+    public static final ModConfigSpec.DoubleValue BAT_PROXIMITY_RADIUS = BUILDER
+            .comment("Distance (blocs) a laquelle une chauve-souris doit passer du joueur pour valider la quete.")
+            .defineInRange("questBatman.bat.proximityRadius", 3.0, 1.0, 16.0);
+
+    // ---------------------------------------------------------------------
+    // Armor effects (suit-intrinsic, quest 7)
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.DoubleValue FALL_DAMAGE_REDUCTION = BUILDER
-            .comment("Reduction des degats de chute apportee par les jambieres (0.3 = -30%).")
+            .comment("Reduction des degats de chute apportee par les jambieres elles-memes (0.3 = -30%).")
             .defineInRange("questBatman.armor.fallDamageReduction", 0.3, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue GLIDE_FALL_SPEED = BUILDER
@@ -85,7 +127,7 @@ public class HJConfig {
             .defineInRange("questBatman.armor.glideHorizontalSpeed", 0.12, 0.0, 1.0);
 
     // ---------------------------------------------------------------------
-    // Gadgets
+    // Gadgets (quest 7 unlock)
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.IntValue GRAPPLE_RANGE = BUILDER
             .comment("Portee maximale (blocs) du grappin.")
@@ -116,33 +158,10 @@ public class HJConfig {
             .defineInRange("questBatman.gadgets.batarangSlowDurationTicks", 60, 0, 1000);
 
     // ---------------------------------------------------------------------
-    // Boss stats
-    // ---------------------------------------------------------------------
-    public static final ModConfigSpec.DoubleValue KEN_HEALTH = BUILDER
-            .comment("Points de vie de Ken (boss quete 4).")
-            .defineInRange("questBatman.bosses.ken.health", 150.0, 1.0, 5000.0);
-
-    public static final ModConfigSpec.DoubleValue SCARECROW_HEALTH = BUILDER
-            .comment("Points de vie de Scarecrow (boss quete 6).")
-            .defineInRange("questBatman.bosses.scarecrow.health", 200.0, 1.0, 5000.0);
-
-    public static final ModConfigSpec.DoubleValue HENRI_HEALTH = BUILDER
-            .comment("Points de vie de Henri / Ra's al Ghul (boss final quete 7).")
-            .defineInRange("questBatman.bosses.henri.health", 250.0, 1.0, 5000.0);
-
-    public static final ModConfigSpec.IntValue BOSS_RESPAWN_DELAY_TICKS = BUILDER
-            .comment("Delai avant qu'un boss respawn a son point d'ancrage apres avoir ete vaincu. 36000 ticks = 30 minutes de jeu (a la vitesse normale).")
-            .defineInRange("questBatman.bosses.respawnDelayTicks", 36000, 200, 1000000);
-
-    public static final ModConfigSpec.IntValue BOSS_CREDIT_DAMAGE_WINDOW_TICKS = BUILDER
-            .comment("Fenetre (ticks) pendant laquelle un joueur ayant inflige des degats a un boss est considere comme participant au combat pour la validation de quete.")
-            .defineInRange("questBatman.bosses.creditWindowTicks", 600, 20, 12000);
-
-    // ---------------------------------------------------------------------
-    // Wayne Manor protection
+    // Wayne Manor protection (decorative in this arc - see README)
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.BooleanValue WAYNE_MANOR_PROTECTION_ENABLED = BUILDER
-            .comment("Active la protection totale des manoirs Wayne pour les joueurs n'ayant pas termine la quete 7.")
+            .comment("Active la protection totale des manoirs Wayne. Aucune quete de cet arc ne retire cette protection - voir le README.")
             .define("questBatman.wayneManor.protectionEnabled", true);
 
     public static final ModConfigSpec.IntValue WAYNE_MANOR_PROTECTION_RADIUS = BUILDER

@@ -2,10 +2,7 @@ package com.heroesjourney.client;
 
 import com.heroesjourney.client.gui.HudTrackerOverlay;
 import com.heroesjourney.client.gui.RosterScreen;
-import com.heroesjourney.client.renderer.SimpleHumanoidRenderer;
 import com.heroesjourney.entity.HJEntities;
-import com.heroesjourney.entity.boss.FearToxinProjectile;
-import com.heroesjourney.entity.npc.QuestNpcEntity;
 import com.heroesjourney.item.gadget.BatarangEntity;
 import com.heroesjourney.item.gadget.SmokePebbleEntity;
 import com.heroesjourney.network.HJNetworking;
@@ -39,15 +36,8 @@ public final class ClientSetup {
     }
 
     private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(HJEntities.QUEST_NPC.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, QuestNpcEntity::npcTexture, 0.5F));
-        event.registerEntityRenderer(HJEntities.NINJA.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> ninjaTexture(), 0.5F));
-        event.registerEntityRenderer(HJEntities.PRISON_GUARD.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> guardTexture(), 0.5F));
-        event.registerEntityRenderer(HJEntities.KEN_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> kenTexture(), 0.6F));
-        event.registerEntityRenderer(HJEntities.SCARECROW_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> scarecrowTexture(), 0.6F));
-        event.registerEntityRenderer(HJEntities.HENRI_BOSS.get(), ctx -> new SimpleHumanoidRenderer<>(ctx, e -> henriTexture(), 0.6F));
         event.registerEntityRenderer(HJEntities.BATARANG.get(), ctx -> new ThrownItemRenderer<BatarangEntity>(ctx));
         event.registerEntityRenderer(HJEntities.SMOKE_PEBBLE.get(), ctx -> new ThrownItemRenderer<SmokePebbleEntity>(ctx));
-        event.registerEntityRenderer(HJEntities.FEAR_TOXIN.get(), ctx -> new ThrownItemRenderer<FearToxinProjectile>(ctx));
     }
 
     private static void registerGuiLayers(RegisterGuiLayersEvent event) {
@@ -65,27 +55,7 @@ public final class ClientSetup {
             }
         }
         while (KeyBindings.USE_ABILITY.consumeClick()) {
-            HJNetworking.sendToServer(new UseAbilityPayload(com.heroesjourney.content.batman.BatmanAbilities.DETECTIVE_SENSE));
+            HJNetworking.sendToServer(new UseAbilityPayload(com.heroesjourney.content.batman.BatmanAbilities.CHEST_GLOW));
         }
-    }
-
-    private static ResourceLocation ninjaTexture() {
-        return ResourceLocation.fromNamespaceAndPath(com.heroesjourney.HeroesJourney.MODID, "textures/entity/ninja.png");
-    }
-
-    private static ResourceLocation kenTexture() {
-        return ResourceLocation.fromNamespaceAndPath(com.heroesjourney.HeroesJourney.MODID, "textures/entity/ken.png");
-    }
-
-    private static ResourceLocation guardTexture() {
-        return ResourceLocation.fromNamespaceAndPath(com.heroesjourney.HeroesJourney.MODID, "textures/entity/prison_guard.png");
-    }
-
-    private static ResourceLocation scarecrowTexture() {
-        return ResourceLocation.fromNamespaceAndPath(com.heroesjourney.HeroesJourney.MODID, "textures/entity/scarecrow.png");
-    }
-
-    private static ResourceLocation henriTexture() {
-        return ResourceLocation.fromNamespaceAndPath(com.heroesjourney.HeroesJourney.MODID, "textures/entity/henri.png");
     }
 }

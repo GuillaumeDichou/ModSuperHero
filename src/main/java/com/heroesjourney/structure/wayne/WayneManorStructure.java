@@ -14,11 +14,10 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 /**
  * Dedicated structure for Wayne Manor: places the pre-built {@code wayne_manor.nbt} and
  * {@code wayne_cemetery.nbt} templates together as a single generation (one structure, two
- * pieces sharing one {@link StructurePiecesBuilder}), so rarity/biome placement, the protection
- * zone, and the quest-1 grave anchor all cover the whole domain at once. Kept separate from the
- * generic {@code HeroBuildingStructure}/{@code HeroBuildingPiece} system used by the other four
- * Batman structures - Wayne Manor is unique and detailed enough to deserve bespoke code, while
- * prison/monastery/asylum/train stay on the simple, reusable "box building" system.
+ * pieces sharing one {@link StructurePiecesBuilder}), so rarity/biome placement and the
+ * protection zone cover the whole domain at once. This is the only custom structure left in the
+ * mod - the "Origine" arc's questline no longer points at Wayne Manor for any quest condition
+ * (see the README); it is kept purely as a decorative domain to find.
  */
 public class WayneManorStructure extends Structure {
 

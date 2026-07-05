@@ -25,14 +25,9 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
  * Places the pre-built {@code wayne_cemetery.nbt} template (15x6x11, entrance facing +z/south)
  * and then overlays two of the mod's own marker blocks ({@code heroesjourney:wayne_grave_thomas}
  * / {@code _martha}) exactly on top of the template's two steles (local positions (5,1,3) and
- * (9,1,3), per the template's own design).
- * <p>
- * This is the "explicit anchor" the quest-1 grave-proximity objective relies on: the template's
- * own stele blocks are plain deepslate with nothing unique to search for, so
- * {@code ProximityToBlockCondition} needs an actual marker - and since this class computes the
- * marker positions directly from {@link #templatePosition} (this piece's own real placement, set
- * once by {@link WayneManorStructure#findGenerationPoint}), there is no coordinate offset copied
- * from the manor or hard-coded anywhere else to drift out of sync.
+ * (9,1,3), per the template's own design). Purely decorative in the "Origine" arc - no quest
+ * condition points at these markers anymore (see the README) - but left in place since a future
+ * arc may want an explicit, drift-proof anchor for them again.
  */
 public class WayneCemeteryPiece extends TemplateStructurePiece {
 

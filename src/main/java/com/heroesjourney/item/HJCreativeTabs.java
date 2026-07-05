@@ -31,8 +31,7 @@ public final class HJCreativeTabs {
                         output.accept(HJItems.BATARANG.get());
                         output.accept(HJItems.GRAPPLE_HOOK.get());
                         output.accept(HJItems.SMOKE_PEBBLE.get());
-                        output.accept(HJItems.RUSTY_CELL_KEY.get());
-                        output.accept(HJItems.TREASURE_MAP.get());
+                        output.accept(HJItems.RIDDLE_BOOK.get());
                         output.accept(HJItems.WAYNE_GRAVE_THOMAS_ITEM.get());
                         output.accept(HJItems.WAYNE_GRAVE_MARTHA_ITEM.get());
                     }).build());

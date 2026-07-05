@@ -43,14 +43,12 @@ public class HeroesJourney {
         HJItems.BLOCKS.register(modEventBus);
         HJCreativeTabs.TABS.register(modEventBus);
         HJEntities.ENTITY_TYPES.register(modEventBus);
-        HJEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         HJAttachments.ATTACHMENT_TYPES.register(modEventBus);
         HJStructures.STRUCTURE_TYPES.register(modEventBus);
         com.heroesjourney.structure.HJStructurePieceTypes.STRUCTURE_PIECE_TYPES.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(HJNetworking::register);
-        modEventBus.addListener(HJEntities::registerAttributes);
 
         NeoForge.EVENT_BUS.register(QuestManager.INSTANCE);
         NeoForge.EVENT_BUS.register(new com.heroesjourney.item.armor.ArmorEffectsHandler());

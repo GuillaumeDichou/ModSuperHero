@@ -13,9 +13,6 @@ public final class HJStructurePieceTypes {
     public static final DeferredRegister<StructurePieceType> STRUCTURE_PIECE_TYPES =
             DeferredRegister.create(Registries.STRUCTURE_PIECE, HeroesJourney.MODID);
 
-    public static final DeferredHolder<StructurePieceType, StructurePieceType> HERO_BUILDING =
-            STRUCTURE_PIECE_TYPES.register("hero_building", () -> (StructurePieceType.ContextlessType) HeroBuildingPiece::new);
-
     // Both Wayne pieces are NBT-template based (TemplateStructurePiece) and need the
     // StructureTemplateManager from the serialization context on load, so they use the base
     // StructurePieceType functional interface (context + tag) rather than ContextlessType.

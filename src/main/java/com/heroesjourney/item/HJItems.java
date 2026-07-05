@@ -1,7 +1,6 @@
 package com.heroesjourney.item;
 
 import com.heroesjourney.HeroesJourney;
-import com.heroesjourney.entity.boss.BossSpawnerBlock;
 import com.heroesjourney.item.armor.BatSuitArmorMaterial;
 import com.heroesjourney.item.gadget.BatarangItem;
 import com.heroesjourney.item.gadget.GrappleHookItem;
@@ -26,6 +25,7 @@ public final class HJItems {
     // Blocks
     // -----------------------------------------------------------------
 
+    // Kept for the Wayne Manor domain (decorative, no quest condition in this arc - see README).
     public static final DeferredBlock<Block> WAYNE_GRAVE_THOMAS = BLOCKS.registerBlock("wayne_grave_thomas",
             props -> new HeroGraveBlock(props), BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(-1.0F, 3600000.0F).noOcclusion());
@@ -33,10 +33,6 @@ public final class HJItems {
     public static final DeferredBlock<Block> WAYNE_GRAVE_MARTHA = BLOCKS.registerBlock("wayne_grave_martha",
             props -> new HeroGraveBlock(props), BlockBehaviour.Properties.of()
                     .mapColor(MapColor.STONE).sound(SoundType.STONE).strength(-1.0F, 3600000.0F).noOcclusion());
-
-    public static final DeferredBlock<Block> BOSS_SPAWNER_BLOCK = BLOCKS.registerBlock("boss_spawner",
-            props -> new BossSpawnerBlock(props), BlockBehaviour.Properties.of()
-                    .mapColor(MapColor.FIRE).sound(SoundType.STONE).strength(-1.0F, 3600000.0F).noOcclusion().lightLevel(state -> 3));
 
     public static final DeferredItem<net.minecraft.world.item.BlockItem> WAYNE_GRAVE_THOMAS_ITEM =
             ITEMS.registerSimpleBlockItem("wayne_grave_thomas", WAYNE_GRAVE_THOMAS);
@@ -97,11 +93,8 @@ public final class HJItems {
     // Quest items
     // -----------------------------------------------------------------
 
-    public static final DeferredItem<Item> RUSTY_CELL_KEY = ITEMS.registerSimpleItem("rusty_cell_key",
-            new Item.Properties().stacksTo(1));
-
-    public static final DeferredItem<Item> TREASURE_MAP = ITEMS.registerSimpleItem("treasure_map",
-            new Item.Properties().stacksTo(1));
+    public static final DeferredItem<RiddleBookItem> RIDDLE_BOOK = ITEMS.registerItem("riddle_book",
+            RiddleBookItem::new, new Item.Properties().stacksTo(1));
 
     private HJItems() {
     }

@@ -26,18 +26,18 @@ public final class ServerPayloadHandler {
         });
     }
 
-    public static void handleDialogueChoice(DialogueChoicePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player) {
-                QuestManager.INSTANCE.handleDialogueChoice(player, payload.npcEntityId(), payload.choiceId());
-            }
-        });
-    }
-
     public static void handleUseAbility(UseAbilityPayload payload, IPayloadContext context) {
         context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer player) {
                 QuestManager.INSTANCE.handleUseAbility(player, payload.abilityId());
+            }
+        });
+    }
+
+    public static void handlePuzzleSolved(PuzzleSolvedPayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> {
+            if (context.player() instanceof ServerPlayer player) {
+                QuestManager.INSTANCE.firePuzzleSolved(player);
             }
         });
     }

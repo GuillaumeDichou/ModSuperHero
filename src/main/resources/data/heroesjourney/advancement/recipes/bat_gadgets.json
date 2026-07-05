@@ -1,0 +1,16 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "unlock": {
+      "trigger": "minecraft:impossible",
+      "conditions": {}
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "heroesjourney:batarang",
+      "heroesjourney:grapple_hook",
+      "heroesjourney:smoke_pebble"
+    ]
+  }
+}

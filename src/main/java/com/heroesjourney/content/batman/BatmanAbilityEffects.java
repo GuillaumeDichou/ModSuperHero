@@ -9,21 +9,23 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 
 /**
- * "Detective sense": rather than a client-side outline shader (fragile across renderer
- * versions), chests within range are revealed with a short burst of particles sent only to the
- * activating player, repeated for the configured duration.
+ * Quest-4 reward ability: rather than a client-side outline shader (fragile across renderer
+ * versions) or an invisible marker entity carrying the vanilla Glowing effect (untested in this
+ * codebase), chests within range are revealed with a short burst of particles sent only to the
+ * activating player, repeated for the configured duration - the same proven mechanism this mod
+ * already used for the old "detective sense" ability.
  */
 public final class BatmanAbilityEffects {
 
     private BatmanAbilityEffects() {
     }
 
-    public static void detectiveSense(ServerPlayer player) {
+    public static void chestGlow(ServerPlayer player) {
         if (!(player.level() instanceof ServerLevel level)) {
             return;
         }
-        int radius = HJConfig.DETECTIVE_SENSE_RADIUS.get();
-        int durationTicks = HJConfig.DETECTIVE_SENSE_DURATION_TICKS.get();
+        int radius = HJConfig.CHEST_GLOW_RADIUS.get();
+        int durationTicks = HJConfig.CHEST_GLOW_DURATION_TICKS.get();
         BlockPos center = player.blockPosition();
         java.util.List<BlockPos> chestPositions = new java.util.ArrayList<>();
         // Scan every loaded chunk within range for chest block entities.
@@ -52,6 +54,6 @@ public final class BatmanAbilityEffects {
                 }
             }));
         }
-        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("heroesjourney.ability.detective_sense.used"), true);
+        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("heroesjourney.ability.chest_glow.used"), true);
     }
 }

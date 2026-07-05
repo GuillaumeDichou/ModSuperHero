@@ -1,9 +1,8 @@
 package com.heroesjourney.client;
 
-import com.heroesjourney.client.gui.DialogueScreen;
+import com.heroesjourney.client.gui.PuzzleScreen;
 import com.heroesjourney.data.HeroData;
-import com.heroesjourney.dialogue.DialogueView;
-import com.heroesjourney.network.OpenDialoguePayload;
+import com.heroesjourney.network.OpenPuzzlePayload;
 import com.heroesjourney.network.SyncHeroDataPayload;
 import net.minecraft.client.Minecraft;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -22,15 +21,7 @@ public final class ClientPayloadHandler {
         });
     }
 
-    public static void handleOpenDialogue(OpenDialoguePayload payload, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            DialogueView view = payload.toView();
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.screen instanceof DialogueScreen current) {
-                current.updateView(view);
-            } else {
-                mc.setScreen(new DialogueScreen(view));
-            }
-        });
+    public static void handleOpenPuzzle(OpenPuzzlePayload payload, IPayloadContext context) {
+        context.enqueueWork(() -> Minecraft.getInstance().setScreen(new PuzzleScreen(payload)));
     }
 }
