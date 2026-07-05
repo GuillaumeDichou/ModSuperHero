@@ -91,13 +91,13 @@
 
   "reward.heroesjourney.batman.stealth_trained": "Passif : détection réduite par les mobs hostiles",
   "reward.heroesjourney.batman.riddle_book": "Carnet d'énigmes",
-  "reward.heroesjourney.batman.chest_glow": "Capacité : lueur des coffres",
+  "reward.heroesjourney.batman.threat_glow": "Capacité : repérage des menaces",
   "reward.heroesjourney.batman.martial_arts_trained": "Passifs : dégâts et vitesse d'attaque à mains nues",
   "reward.heroesjourney.batman.armor_recipes_unlocked": "Recettes de l'armure débloquées",
   "reward.heroesjourney.batman.starter_kit": "Recettes des gadgets + kit de départ : grappin, batarangs, fumigènes",
 
   "heroesjourney.quest.completed": "Quête terminée : %s",
   "heroesjourney.quest.arc_completed": "%s : Arc terminé !",
-  "heroesjourney.ability.chest_glow.used": "Lueur des coffres activée",
+  "heroesjourney.ability.threat_glow.used": "Menaces repérées : %s mob(s) illuminé(s)",
   "heroesjourney.recipe.locked": "Cette recette n'est pas encore débloquée."
 }

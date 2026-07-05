@@ -55,7 +55,7 @@ public final class ClientSetup {
             }
         }
         while (KeyBindings.USE_ABILITY.consumeClick()) {
-            HJNetworking.sendToServer(new UseAbilityPayload(com.heroesjourney.content.batman.BatmanAbilities.CHEST_GLOW));
+            HJNetworking.sendToServer(new UseAbilityPayload(com.heroesjourney.content.batman.BatmanAbilities.THREAT_GLOW));
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.heroesjourney.item.armor;
 
+import com.heroesjourney.HeroesJourney;
 import com.heroesjourney.config.HJConfig;
 import com.heroesjourney.content.batman.BatmanAbilities;
 import com.heroesjourney.data.HJAttachments;
@@ -48,14 +49,28 @@ public final class ArmorEffectsHandler {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
-        if (!isBatmanActive(player)) {
+        boolean debugTick = player.tickCount % 10 == 0;
+        boolean batmanActive = isBatmanActive(player);
+        if (!batmanActive) {
             return;
         }
-        if (!player.getItemBySlot(EquipmentSlot.CHEST).is(HJItems.BAT_ARMORED_CHESTPLATE.get())) {
+        boolean wearingChestplate = player.getItemBySlot(EquipmentSlot.CHEST).is(HJItems.BAT_ARMORED_CHESTPLATE.get());
+        if (!wearingChestplate) {
+            if (debugTick) {
+                HeroesJourney.LOGGER.info("[glide-debug] {} batmanActive=true chestplateWorn=false (need heroesjourney:bat_armored_chestplate in the chest slot specifically)",
+                        player.getGameProfile().getName());
+            }
             return;
         }
-        boolean falling = player.getDeltaMovement().y < 0 && !player.onGround();
-        if (player.isShiftKeyDown() && falling) {
+        boolean onGround = player.onGround();
+        double velocityY = player.getDeltaMovement().y;
+        boolean falling = velocityY < 0 && !onGround;
+        boolean sneaking = player.isShiftKeyDown();
+        if (debugTick) {
+            HeroesJourney.LOGGER.info("[glide-debug] {} chestplateWorn=true sneaking={} onGround={} velocityY={} falling={} -> gliding={}",
+                    player.getGameProfile().getName(), sneaking, onGround, velocityY, falling, sneaking && falling);
+        }
+        if (sneaking && falling) {
             // Short duration, refreshed every tick while gliding - fades out within a second of
             // releasing sneak or landing rather than lingering, same trade-off already accepted
             // for the suit's other pulse-refreshed effects (see BatmanEffects).

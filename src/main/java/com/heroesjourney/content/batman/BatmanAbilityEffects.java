@@ -1,59 +1,35 @@
 package com.heroesjourney.content.batman;
 
 import com.heroesjourney.config.HJConfig;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
 
 /**
- * Quest-4 reward ability: rather than a client-side outline shader (fragile across renderer
- * versions) or an invisible marker entity carrying the vanilla Glowing effect (untested in this
- * codebase), chests within range are revealed with a short burst of particles sent only to the
- * activating player, repeated for the configured duration - the same proven mechanism this mod
- * already used for the old "detective sense" ability.
+ * Quest-4 reward ability: unlike the old "reveal chests" idea, vanilla's Glowing effect only
+ * ever applies to entities, never to blocks - so it genuinely works here, applied to every
+ * hostile mob within range. This gives the real "silhouette visible through walls" render
+ * vanilla already ships (the same one spectral arrows use), no custom outline rendering needed.
  */
 public final class BatmanAbilityEffects {
 
     private BatmanAbilityEffects() {
     }
 
-    public static void chestGlow(ServerPlayer player) {
-        if (!(player.level() instanceof ServerLevel level)) {
-            return;
-        }
-        int radius = HJConfig.CHEST_GLOW_RADIUS.get();
-        int durationTicks = HJConfig.CHEST_GLOW_DURATION_TICKS.get();
-        BlockPos center = player.blockPosition();
-        java.util.List<BlockPos> chestPositions = new java.util.ArrayList<>();
-        // Scan every loaded chunk within range for chest block entities.
-        int chunkRadius = (radius / 16) + 1;
-        for (int cx = -chunkRadius; cx <= chunkRadius; cx++) {
-            for (int cz = -chunkRadius; cz <= chunkRadius; cz++) {
-                var chunk = level.getChunkSource().getChunkNow((center.getX() >> 4) + cx, (center.getZ() >> 4) + cz);
-                if (chunk == null) {
-                    continue;
-                }
-                for (BlockEntity be : chunk.getBlockEntities().values()) {
-                    if (be instanceof ChestBlockEntity && be.getBlockPos().closerThan(center, radius) && !chestPositions.contains(be.getBlockPos())) {
-                        chestPositions.add(be.getBlockPos());
-                    }
-                }
+    public static void threatGlow(ServerPlayer player) {
+        int radius = HJConfig.THREAT_GLOW_RADIUS.get();
+        int durationTicks = HJConfig.THREAT_GLOW_DURATION_TICKS.get();
+        var box = player.getBoundingBox().inflate(radius);
+        int glowed = 0;
+        for (Mob mob : player.level().getEntitiesOfClass(Mob.class, box)) {
+            if (mob instanceof Enemy && mob.isAlive() && mob.closerThan(player, radius)) {
+                mob.addEffect(new MobEffectInstance(MobEffects.GLOWING, durationTicks, 0, false, true, true));
+                glowed++;
             }
         }
-
-        int pulses = Math.max(1, durationTicks / 10);
-        for (int i = 0; i < pulses; i++) {
-            int delay = i * 10;
-            level.getServer().tell(new net.minecraft.server.TickTask(level.getServer().getTickCount() + delay, () -> {
-                for (BlockPos pos : chestPositions) {
-                    level.sendParticles(player, ParticleTypes.END_ROD, false,
-                            pos.getX() + 0.5, pos.getY() + 0.7, pos.getZ() + 0.5, 3, 0.15, 0.15, 0.15, 0.0);
-                }
-            }));
-        }
-        player.displayClientMessage(net.minecraft.network.chat.Component.translatable("heroesjourney.ability.chest_glow.used"), true);
+        player.displayClientMessage(Component.translatable("heroesjourney.ability.threat_glow.used", glowed), true);
     }
 }

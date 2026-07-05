@@ -5,6 +5,7 @@ import com.heroesjourney.data.HeroData;
 import com.heroesjourney.data.HeroProgress;
 import com.heroesjourney.hero.HeroDefinition;
 import com.heroesjourney.hero.HeroRegistry;
+import com.heroesjourney.item.HJItems;
 import com.heroesjourney.network.HJNetworking;
 import com.heroesjourney.quest.QuestManager;
 import com.mojang.brigadier.CommandDispatcher;
@@ -16,6 +17,8 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 
 /**
  * Admin/debug command. Not gated behind any permission mod - relies on vanilla's op-level
@@ -46,6 +49,9 @@ public final class HJCommand {
                                 .then(Commands.argument("ability", StringArgumentType.word())
                                         .executes(HJCommand::unlockAbility))))
                 .then(Commands.literal("listheroes").executes(HJCommand::listHeroes))
+                .then(Commands.literal("stats")
+                        .then(Commands.argument("player", EntityArgument.player())
+                                .executes(HJCommand::showStats)))
         );
     }
 
@@ -94,5 +100,45 @@ public final class HJCommand {
         }
         ctx.getSource().sendSuccess(() -> Component.literal(sb.toString()), false);
         return 1;
+    }
+
+    /**
+     * Prints the player's current hero progress and the live values of the attributes/gear this
+     * mod's quest rewards actually modify, so a tester can confirm a bonus really applied without
+     * having to infer it indirectly (e.g. by fighting something).
+     */
+    private static int showStats(CommandContext<CommandSourceStack> ctx) throws com.mojang.brigadier.exceptions.CommandSyntaxException {
+        ServerPlayer player = EntityArgument.getPlayer(ctx, "player");
+        HeroData data = player.getData(HJAttachments.HERO_DATA);
+
+        send(ctx, "=== Hero's Journey - " + player.getGameProfile().getName() + " ===");
+        send(ctx, "Active hero: " + data.activeHero());
+
+        if (data.hasActiveHero()) {
+            HeroProgress progress = data.getProgress(data.activeHero());
+            if (progress != null) {
+                send(ctx, "Stage index: " + progress.stageIndex());
+                send(ctx, "Flags: " + progress.flags());
+                send(ctx, "Unlocked abilities: " + progress.unlockedAbilities());
+            }
+        }
+
+        send(ctx, String.format("Movement speed attribute: %.4f", player.getAttributeValue(Attributes.MOVEMENT_SPEED)));
+        send(ctx, String.format("Attack damage attribute: %.2f", player.getAttributeValue(Attributes.ATTACK_DAMAGE)));
+        send(ctx, String.format("Attack speed attribute: %.2f", player.getAttributeValue(Attributes.ATTACK_SPEED)));
+        send(ctx, "Main hand: " + player.getMainHandItem());
+        send(ctx, "Active potion effects: " + player.getActiveEffects());
+
+        send(ctx, "Worn suit pieces: cowl=" + player.getItemBySlot(EquipmentSlot.HEAD).is(HJItems.BAT_COWL.get())
+                + " chestplate=" + player.getItemBySlot(EquipmentSlot.CHEST).is(HJItems.BAT_ARMORED_CHESTPLATE.get())
+                + " leggings=" + player.getItemBySlot(EquipmentSlot.LEGS).is(HJItems.BAT_LEGGINGS.get())
+                + " boots=" + player.getItemBySlot(EquipmentSlot.FEET).is(HJItems.BAT_BOOTS.get()));
+        send(ctx, "Sneaking=" + player.isShiftKeyDown() + " onGround=" + player.onGround()
+                + " velocityY=" + player.getDeltaMovement().y);
+        return 1;
+    }
+
+    private static void send(CommandContext<CommandSourceStack> ctx, String line) {
+        ctx.getSource().sendSuccess(() -> Component.literal(line), false);
     }
 }

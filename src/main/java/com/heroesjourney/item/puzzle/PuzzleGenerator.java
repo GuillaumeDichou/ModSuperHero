@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.util.RandomSource;
 
-/** Picks one of the three puzzle types at random and generates its server-side content. */
+/**
+ * Generates the riddle book's puzzle content. The 3 puzzle types are shown in a fixed sequence
+ * (sliding tile puzzle, then lock-picking, then Mastermind) rather than picked at random - see
+ * {@link #generateSequenced}.
+ */
 public final class PuzzleGenerator {
 
     /** Fixed 3x3 layout to match the sliced evidence-photo texture; not worth exposing in config. */
@@ -15,11 +19,18 @@ public final class PuzzleGenerator {
     private PuzzleGenerator() {
     }
 
-    public static OpenPuzzlePayload generate(RandomSource random) {
-        return switch (random.nextInt(3)) {
-            case 0 -> generateMastermind(random);
-            case 1 -> generateSliding(random);
-            default -> generateLockpick();
+    /**
+     * {@code sequenceIndex} is how many of the fixed 3 puzzles the player has already solved for
+     * their current puzzle-solving objective (0 = show the 1st puzzle, 1 = show the 2nd, etc.) -
+     * see {@code QuestManager#currentPuzzleProgress}, which is what makes the sequence resume
+     * correctly after closing and reopening the book instead of restarting at puzzle 1. Indices
+     * beyond the 3-item sequence repeat the last puzzle (Mastermind).
+     */
+    public static OpenPuzzlePayload generateSequenced(int sequenceIndex, RandomSource random) {
+        return switch (Math.min(sequenceIndex, 2)) {
+            case 0 -> generateSliding(random);
+            case 1 -> generateLockpick();
+            default -> generateMastermind(random);
         };
     }
 

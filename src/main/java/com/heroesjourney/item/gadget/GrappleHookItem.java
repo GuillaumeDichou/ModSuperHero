@@ -1,5 +1,6 @@
 package com.heroesjourney.item.gadget;
 
+import com.heroesjourney.HeroesJourney;
 import com.heroesjourney.config.HJConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,6 +43,8 @@ public class GrappleHookItem extends Item {
             return InteractionResult.PASS;
         }
         ItemStack stack = context.getItemInHand();
+        HeroesJourney.LOGGER.info("[grapple-debug] {} useOn() called, clickedPos={}, onCooldown={}",
+                player.getGameProfile().getName(), context.getClickedPos(), player.getCooldowns().isOnCooldown(stack.getItem()));
         if (player.getCooldowns().isOnCooldown(stack.getItem())) {
             return InteractionResult.FAIL;
         }
@@ -53,6 +56,8 @@ public class GrappleHookItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
+        HeroesJourney.LOGGER.info("[grapple-debug] {} use() called, onCooldown={}",
+                player.getGameProfile().getName(), player.getCooldowns().isOnCooldown(stack.getItem()));
         if (player.getCooldowns().isOnCooldown(stack.getItem())) {
             return InteractionResultHolder.fail(stack);
         }
@@ -60,6 +65,8 @@ public class GrappleHookItem extends Item {
         Vec3 from = player.getEyePosition();
         Vec3 to = from.add(player.getViewVector(1.0F).scale(range));
         HitResult hit = level.clip(new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+        HeroesJourney.LOGGER.info("[grapple-debug] {} use() raytrace result={} location={}",
+                player.getGameProfile().getName(), hit.getType(), hit.getLocation());
 
         if (hit.getType() == HitResult.Type.MISS) {
             level.playSound(null, player.blockPosition(), SoundEvents.FISHING_BOBBER_THROW, SoundSource.PLAYERS, 0.6F, 1.6F);
@@ -71,6 +78,8 @@ public class GrappleHookItem extends Item {
     }
 
     private void fireGrapple(Level level, Player player, ItemStack stack, Vec3 target) {
+        HeroesJourney.LOGGER.info("[grapple-debug] {} fireGrapple target={} isClientSide={} isServerPlayer={}",
+                player.getGameProfile().getName(), target, level.isClientSide, player instanceof ServerPlayer);
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             GrappleHandler.startPull(serverPlayer, target);
         }

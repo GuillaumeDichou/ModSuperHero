@@ -8,6 +8,7 @@ import com.heroesjourney.effects.HeroEffectsService;
 import com.heroesjourney.hero.HeroDefinition;
 import com.heroesjourney.hero.HeroRegistry;
 import com.heroesjourney.network.HJNetworking;
+import com.heroesjourney.quest.condition.PuzzleCountCondition;
 import com.heroesjourney.quest.event.QuestEvent;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,8 @@ public final class QuestManager {
     private final Map<UUID, Integer> lastSprintStat = new HashMap<>();
     private final Map<UUID, Integer> lastJumpStat = new HashMap<>();
     private final Map<UUID, Integer> lastSwimStat = new HashMap<>();
+    private final Map<UUID, Integer> lastWalkOnWaterStat = new HashMap<>();
+    private final Map<UUID, Integer> lastWalkUnderWaterStat = new HashMap<>();
 
     private QuestManager() {
     }
@@ -61,16 +64,31 @@ public final class QuestManager {
         if (player.tickCount % HEARTBEAT_INTERVAL_TICKS == 0) {
             fireEvent(player, new QuestEvent.Heartbeat());
         }
-        // Distance/count objectives are driven by vanilla's own stats (the same ones behind the
-        // vanilla "distances" advancements/statistics screen) rather than hand-rolled tick
-        // detection: vanilla already tracks these reliably, so there's no risk of under/over
-        // counting from e.g. a missed ground-state transition. All three are stored by vanilla in
-        // centimetres, hence the /100.0 to recover blocks.
+        // Distance/count objectives are driven ENTIRELY by vanilla's own stats (the same ones
+        // behind the vanilla "distances" advancements/statistics screen) - there is no
+        // hand-rolled tick-by-tick position tracking left anywhere in this class; this method is
+        // the single, sole source of truth for run/jump/swim progress. All distance stats are
+        // stored by vanilla in centimetres, hence the /100.0 to recover blocks.
+        //
+        // Swimming sums THREE vanilla stats rather than just SWIM_ONE_CM: vanilla only awards
+        // SWIM_ONE_CM while the player is in the fast "swimming" pose (sprint-swimming), and that
+        // stat is full 3D distance (so bobbing up/down while sprint-swimming counts fully, same
+        // as vanilla's own "Distance Swum" stat-screen entry - not a bug in this tracking code,
+        // just what that particular vanilla stat measures). Slower/casual swimming (no sprint
+        // pose) previously wasn't tracked AT ALL, because only SWIM_ONE_CM was read - that's what
+        // caused "sometimes not counting at all". WALK_ON_WATER_ONE_CM (surface) and
+        // WALK_UNDER_WATER_ONE_CM (submerged) cover that casual-swimming case, and both are
+        // horizontal-only distance, so combining all three both fixes the undercounting and dilutes
+        // the vertical-bobbing contribution instead of it being the only thing tracked.
         trackVanillaStatDelta(player, lastSprintStat, Stats.CUSTOM.get(Stats.SPRINT_ONE_CM),
                 delta -> new QuestEvent.SprintDistance(delta / 100.0));
         trackVanillaStatDelta(player, lastJumpStat, Stats.CUSTOM.get(Stats.JUMP),
                 delta -> new QuestEvent.PlayerJumped(delta));
         trackVanillaStatDelta(player, lastSwimStat, Stats.CUSTOM.get(Stats.SWIM_ONE_CM),
+                delta -> new QuestEvent.SwimDistance(delta / 100.0));
+        trackVanillaStatDelta(player, lastWalkOnWaterStat, Stats.CUSTOM.get(Stats.WALK_ON_WATER_ONE_CM),
+                delta -> new QuestEvent.SwimDistance(delta / 100.0));
+        trackVanillaStatDelta(player, lastWalkUnderWaterStat, Stats.CUSTOM.get(Stats.WALK_UNDER_WATER_ONE_CM),
                 delta -> new QuestEvent.SwimDistance(delta / 100.0));
         HeroEffectsService.tick(player);
     }
@@ -132,9 +150,12 @@ public final class QuestManager {
 
     @SubscribeEvent
     public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
-        lastSprintStat.remove(event.getEntity().getUUID());
-        lastJumpStat.remove(event.getEntity().getUUID());
-        lastSwimStat.remove(event.getEntity().getUUID());
+        UUID id = event.getEntity().getUUID();
+        lastSprintStat.remove(id);
+        lastJumpStat.remove(id);
+        lastSwimStat.remove(id);
+        lastWalkOnWaterStat.remove(id);
+        lastWalkUnderWaterStat.remove(id);
     }
 
     @SubscribeEvent
@@ -276,5 +297,39 @@ public final class QuestManager {
 
     public void firePuzzleSolved(ServerPlayer player) {
         fireEvent(player, new QuestEvent.PuzzleSolved());
+    }
+
+    /**
+     * How many riddle-book puzzles the player's currently active hero stage's
+     * {@link PuzzleCountCondition} objective has recorded so far (0 if the active stage has no
+     * such objective, or no hero is active). Generic on purpose - it doesn't hard-code which
+     * hero/stage/objective this is, so any future hero's own puzzle item can reuse it - used to
+     * pick which puzzle in a fixed sequence to show next, so the sequence survives closing and
+     * reopening the item.
+     */
+    public int currentPuzzleProgress(ServerPlayer player) {
+        HeroData data = player.getData(HJAttachments.HERO_DATA);
+        if (!data.hasActiveHero()) {
+            return 0;
+        }
+        String heroId = data.activeHero();
+        HeroDefinition hero = HeroRegistry.get(heroId).orElse(null);
+        if (hero == null) {
+            return 0;
+        }
+        HeroProgress progress = data.getProgress(heroId);
+        if (progress == null) {
+            return 0;
+        }
+        QuestStage stage = hero.questline().stageAt(progress.stageIndex()).orElse(null);
+        if (stage == null) {
+            return 0;
+        }
+        for (QuestObjective objective : stage.objectives()) {
+            if (objective.condition() instanceof PuzzleCountCondition) {
+                return progress.progressFor(stage.id() + ":" + objective.id());
+            }
+        }
+        return 0;
     }
 }

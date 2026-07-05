@@ -5,8 +5,8 @@ public final class BatmanAbilities {
 
     public static final String HERO_ID = "batman";
 
-    /** Chest-glow ability (quest 4 reward) - see {@link BatmanAbilityEffects#chestGlow}. */
-    public static final String CHEST_GLOW = "chest_glow";
+    /** Threat-glow ability (quest 4 reward) - see {@link BatmanAbilityEffects#threatGlow}. */
+    public static final String THREAT_GLOW = "threat_glow";
 
     public static final String FLAG_STEALTH_TRAINED = "stealth_trained";
     public static final String FLAG_RUN_TRAINED = "run_trained";

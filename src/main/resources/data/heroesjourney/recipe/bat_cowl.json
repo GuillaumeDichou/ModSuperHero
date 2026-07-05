@@ -1,13 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "equipment",
-  "ingredients": [
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:electronic_component" }
+  "pattern": [
+    "KKK",
+    "K E"
   ],
+  "key": {
+    "K": { "item": "heroesjourney:kevlar_fiber" },
+    "E": { "item": "heroesjourney:electronic_component" }
+  },
   "result": {
     "id": "heroesjourney:bat_cowl",
     "count": 1

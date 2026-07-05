@@ -21,8 +21,8 @@ public class HJConfig {
     // Quest 2 - "Espionnage"
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.IntValue STEALTH_APPROACH_COUNT = BUILDER
-            .comment("Nombre d'approches furtives distinctes requises.")
-            .defineInRange("questBatman.stealth.approachCount", 15, 1, 1000);
+            .comment("Nombre d'approches furtives distinctes requises. Reduit a 1 temporairement pour faciliter les tests.")
+            .defineInRange("questBatman.stealth.approachCount", 1, 1, 1000);
 
     public static final ModConfigSpec.DoubleValue STEALTH_APPROACH_RADIUS = BUILDER
             .comment("Distance maximale (blocs) au mob hostile pour qu'une approche furtive compte.")
@@ -36,16 +36,16 @@ public class HJConfig {
     // Quest 3 - "Physique" (3 sous-categories independantes)
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.IntValue RUN_TRAINING_DISTANCE = BUILDER
-            .comment("Distance (blocs, en sprint) a parcourir pour l'entrainement 'course'.")
-            .defineInRange("questBatman.training.runDistanceBlocks", 3000, 1, 1000000);
+            .comment("Distance (blocs, en sprint) a parcourir pour l'entrainement 'course'. Reduit a 100 temporairement pour faciliter les tests (garde un seuil > 1 pour pouvoir verifier que le comptage est proportionnel).")
+            .defineInRange("questBatman.training.runDistanceBlocks", 100, 1, 1000000);
 
     public static final ModConfigSpec.IntValue JUMP_TRAINING_COUNT = BUILDER
-            .comment("Nombre de sauts a effectuer pour l'entrainement 'saut'.")
-            .defineInRange("questBatman.training.jumpCount", 500, 1, 1000000);
+            .comment("Nombre de sauts a effectuer pour l'entrainement 'saut'. Reduit a 1 temporairement pour faciliter les tests.")
+            .defineInRange("questBatman.training.jumpCount", 1, 1, 1000000);
 
     public static final ModConfigSpec.IntValue SWIM_TRAINING_DISTANCE = BUILDER
-            .comment("Distance (blocs, a la nage) a parcourir pour l'entrainement 'nage'.")
-            .defineInRange("questBatman.training.swimDistanceBlocks", 500, 1, 1000000);
+            .comment("Distance (blocs, a la nage) a parcourir pour l'entrainement 'nage'. Reduit a 100 temporairement pour faciliter les tests (garde un seuil > 1 pour pouvoir verifier que le comptage est proportionnel).")
+            .defineInRange("questBatman.training.swimDistanceBlocks", 100, 1, 1000000);
 
     public static final ModConfigSpec.IntValue RUN_TRAINING_SPEED_LEVEL = BUILDER
             .comment("Niveau (0 = niveau I) de Vitesse permanente accordee par l'entrainement 'course'.")
@@ -59,8 +59,8 @@ public class HJConfig {
     // Quest 4 - "Esprit / enquete" (carnet d'enigmes)
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.IntValue PUZZLE_TARGET_COUNT = BUILDER
-            .comment("Nombre d'enigmes a resoudre pour valider la quete.")
-            .defineInRange("questBatman.puzzle.targetCount", 10, 1, 1000);
+            .comment("Nombre d'enigmes a resoudre pour valider la quete. La sequence est fixe (taquin, crochetage, coffre-fort, dans cet ordre) et compte exactement 3 types - une valeur superieure repete le dernier type (coffre-fort) pour les essais suivants.")
+            .defineInRange("questBatman.puzzle.targetCount", 3, 1, 1000);
 
     public static final ModConfigSpec.IntValue MASTERMIND_CODE_LENGTH = BUILDER
             .comment("Nombre de plots dans le code secret du mini-jeu 'coffre-fort' (Mastermind).")
@@ -82,24 +82,24 @@ public class HJConfig {
             .comment("Largeur (pourcentage de la barre) minimale de la zone cible, atteinte a la derniere goupille.")
             .defineInRange("questBatman.puzzle.lockpickMinZoneWidthPercent", 10, 2, 100);
 
-    public static final ModConfigSpec.IntValue CHEST_GLOW_RADIUS = BUILDER
-            .comment("Rayon (blocs) dans lequel la capacite 'lueur des coffres' revele les coffres.")
-            .defineInRange("questBatman.chestGlow.radius", 20, 1, 128);
+    public static final ModConfigSpec.IntValue THREAT_GLOW_RADIUS = BUILDER
+            .comment("Rayon (blocs) dans lequel la capacite 'reperage des menaces' illumine les mobs hostiles.")
+            .defineInRange("questBatman.threatGlow.radius", 20, 1, 128);
 
-    public static final ModConfigSpec.IntValue CHEST_GLOW_DURATION_TICKS = BUILDER
-            .comment("Duree (ticks) de l'effet de la capacite 'lueur des coffres'. 20 ticks = 1 seconde.")
-            .defineInRange("questBatman.chestGlow.durationTicks", 100, 20, 2000);
+    public static final ModConfigSpec.IntValue THREAT_GLOW_DURATION_TICKS = BUILDER
+            .comment("Duree (ticks) de l'effet Glowing applique aux mobs hostiles. 20 ticks = 1 seconde.")
+            .defineInRange("questBatman.threatGlow.durationTicks", 300, 20, 2000);
 
-    public static final ModConfigSpec.IntValue CHEST_GLOW_COOLDOWN_TICKS = BUILDER
-            .comment("Cooldown (ticks) de la capacite 'lueur des coffres'.")
-            .defineInRange("questBatman.chestGlow.cooldownTicks", 600, 20, 100000);
+    public static final ModConfigSpec.IntValue THREAT_GLOW_COOLDOWN_TICKS = BUILDER
+            .comment("Cooldown (ticks) de la capacite 'reperage des menaces'.")
+            .defineInRange("questBatman.threatGlow.cooldownTicks", 600, 20, 100000);
 
     // ---------------------------------------------------------------------
     // Quest 5 - "Arts martiaux"
     // ---------------------------------------------------------------------
     public static final ModConfigSpec.IntValue MARTIAL_ARTS_KILLS = BUILDER
-            .comment("Nombre de mobs hostiles a vaincre a mains nues (coup fatal) pour valider la quete.")
-            .defineInRange("questBatman.martialArts.kills", 40, 1, 10000);
+            .comment("Nombre de mobs hostiles a vaincre a mains nues (coup fatal) pour valider la quete. Reduit a 1 temporairement pour faciliter les tests.")
+            .defineInRange("questBatman.martialArts.kills", 1, 1, 10000);
 
     public static final ModConfigSpec.DoubleValue UNARMED_DAMAGE_BONUS = BUILDER
             .comment("Bonus additif aux degats a mains nues pour Batman actif, une fois l'entrainement aux arts martiaux valide.")

@@ -63,9 +63,9 @@ public final class BatmanContent {
 
     private static void registerAbilities() {
         AbilityRegistry.register(new Ability(
-                BatmanAbilities.CHEST_GLOW,
-                () -> HJConfig.CHEST_GLOW_COOLDOWN_TICKS.get(),
-                BatmanAbilityEffects::chestGlow
+                BatmanAbilities.THREAT_GLOW,
+                () -> HJConfig.THREAT_GLOW_COOLDOWN_TICKS.get(),
+                BatmanAbilityEffects::threatGlow
         ));
     }
 
@@ -129,9 +129,9 @@ public final class BatmanContent {
                 Component.translatable("quest.heroesjourney.batman.4.description"),
                 List.of(new QuestObjective("solve_puzzles", Component.translatable("objective.heroesjourney.batman.solve_puzzles"),
                         new PuzzleCountCondition(HJConfig.PUZZLE_TARGET_COUNT.get()))),
-                List.of(reward(Component.translatable("reward.heroesjourney.batman.chest_glow"), player ->
+                List.of(reward(Component.translatable("reward.heroesjourney.batman.threat_glow"), player ->
                         player.getData(com.heroesjourney.data.HJAttachments.HERO_DATA).getOrCreateProgress(HERO_ID)
-                                .unlockAbility(BatmanAbilities.CHEST_GLOW))),
+                                .unlockAbility(BatmanAbilities.THREAT_GLOW))),
                 List.of()
         ));
 

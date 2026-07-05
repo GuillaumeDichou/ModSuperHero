@@ -19,9 +19,10 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Thrown batarang: deals a light hit + slows its target, then behaves like a vanilla arrow - if
- * it doesn't hit anything worth reacting to, it just rests where it landed and can be picked back
- * up by walking over it, rather than boomeranging back to the thrower.
+ * Thrown batarang: falls in a gravity arc like a snowball (not a flat/straight throw). If it hits
+ * a mob, it deals its hit and is discarded immediately - it does NOT become a pickupable ground
+ * item in that case. If it hits nothing (lands on a block), it behaves like a vanilla arrow: it
+ * rests where it landed and can be picked back up by walking over it.
  */
 public class BatarangEntity extends ThrowableItemProjectile {
 
@@ -64,7 +65,9 @@ public class BatarangEntity extends ThrowableItemProjectile {
                 living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slowDuration, 1));
             }
         }
-        settleOnGround();
+        // Hitting a mob consumes the batarang - unlike a miss, it does not become a pickupable
+        // ground item.
+        this.discard();
     }
 
     @Override
@@ -92,8 +95,6 @@ public class BatarangEntity extends ThrowableItemProjectile {
         }
     }
 
-    @Override
-    public boolean isNoGravity() {
-        return true;
-    }
+    // No isNoGravity() override: this projectile keeps ThrowableItemProjectile's default gravity,
+    // giving it the same falling arc as a thrown snowball/egg instead of a flat, straight flight.
 }

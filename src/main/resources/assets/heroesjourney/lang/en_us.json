@@ -91,13 +91,13 @@
 
   "reward.heroesjourney.batman.stealth_trained": "Passive: reduced detection by hostile mobs",
   "reward.heroesjourney.batman.riddle_book": "Riddle book",
-  "reward.heroesjourney.batman.chest_glow": "Ability: chest glow",
+  "reward.heroesjourney.batman.threat_glow": "Ability: threat sense",
   "reward.heroesjourney.batman.martial_arts_trained": "Passives: bare-handed damage and attack speed",
   "reward.heroesjourney.batman.armor_recipes_unlocked": "Armour recipes unlocked",
   "reward.heroesjourney.batman.starter_kit": "Gadget recipes + starter kit: grapple, batarangs, smoke pebbles",
 
   "heroesjourney.quest.completed": "Quest complete: %s",
   "heroesjourney.quest.arc_completed": "%s: Arc complete!",
-  "heroesjourney.ability.chest_glow.used": "Chest glow activated",
+  "heroesjourney.ability.threat_glow.used": "Threats revealed: %s hostile mob(s) glowing",
   "heroesjourney.recipe.locked": "This recipe hasn't been unlocked yet."
 }
