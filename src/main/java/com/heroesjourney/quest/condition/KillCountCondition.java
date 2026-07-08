@@ -1,5 +1,6 @@
 package com.heroesjourney.quest.condition;
 
+import com.heroesjourney.HeroesJourney;
 import com.heroesjourney.quest.QuestCondition;
 import com.heroesjourney.quest.QuestEventContext;
 import com.heroesjourney.quest.event.QuestEvent;
@@ -28,11 +29,18 @@ public class KillCountCondition implements QuestCondition {
             return currentProgress;
         }
         if (requireBareHanded && !kill.bareHanded()) {
+            HeroesJourney.LOGGER.info("[martial-arts-debug] {} kill of {} NOT counted: bare-handed required but bareHanded={}",
+                    ctx.player().getGameProfile().getName(), kill.mobTypeId(), kill.bareHanded());
             return currentProgress;
         }
         if (requireSneakAttack && !kill.sneakAttack()) {
+            HeroesJourney.LOGGER.info("[martial-arts-debug] {} kill of {} NOT counted: sneak-attack required but sneakAttack={}",
+                    ctx.player().getGameProfile().getName(), kill.mobTypeId(), kill.sneakAttack());
             return currentProgress;
         }
-        return Math.min(count, currentProgress + 1);
+        int updated = Math.min(count, currentProgress + 1);
+        HeroesJourney.LOGGER.info("[martial-arts-debug] {} kill of {} counted: progress {} -> {} (target {})",
+                ctx.player().getGameProfile().getName(), kill.mobTypeId(), currentProgress, updated, count);
+        return updated;
     }
 }

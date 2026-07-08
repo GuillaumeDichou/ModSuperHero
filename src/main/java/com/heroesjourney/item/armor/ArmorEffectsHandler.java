@@ -1,35 +1,47 @@
 package com.heroesjourney.item.armor;
 
-import com.heroesjourney.HeroesJourney;
 import com.heroesjourney.config.HJConfig;
 import com.heroesjourney.content.batman.BatmanAbilities;
 import com.heroesjourney.data.HJAttachments;
 import com.heroesjourney.data.HeroData;
 import com.heroesjourney.item.HJItems;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 /**
- * Live, per-tick gating of the bat-suit's two "physical" effects (fall damage reduction, cape
- * glide). Implemented as on-demand checks rather than granted potion effects, so - unlike the
- * pulse-refreshed effects in {@code content.batman.BatmanEffects} - they turn on/off exactly
- * instantly when armor, sneak state or active hero changes; there is nothing to "remove" on
- * switch.
+ * Live, per-event/per-tick gating of the bat-suit's intrinsic effects: fall-damage reduction (bat
+ * leggings), night vision (cowl), and the glide-cancel behaviour (chestplate).
  * <p>
- * The glide itself is implemented by granting vanilla's own {@code Slow Falling} effect rather
- * than hand-rolling a vertical-velocity blend: the earlier hand-rolled version fought against
- * vanilla's own gravity integration (applied every tick, in the same direction, right before this
- * handler ran) and could net out to barely any perceptible slow-down. Slow Falling is a real
- * vanilla mechanic that changes the effective gravity constant itself, so it can't be "fought"
- * the same way - refreshed every tick while gliding, it just works.
+ * Night vision is granted ONCE (a very long, effectively-permanent duration) the tick the cowl
+ * becomes worn while Batman is active, not re-granted every tick with a short duration - re-granting
+ * a short duration every tick is what previously kept the remaining duration permanently inside
+ * vanilla's "about to expire" HUD-flash window (that window is ~200 ticks; a duration that never
+ * exceeds it never stops flashing, no matter how often it's refreshed). It is still removed
+ * explicitly and instantly - checked every tick - the moment the cowl comes off or Batman stops
+ * being active, rather than left to expire.
+ * <p>
+ * The glide itself starts and persists entirely through vanilla's own Elytra toggle logic (a single
+ * jump-while-falling triggers it, and it then keeps going on its own, exactly like a real Elytra) -
+ * see {@code BatChestplateItem#canElytraFly}/{@code #elytraFlightTick}. The only thing driven from
+ * here is the one behaviour vanilla doesn't have: cancelling the glide manually, on sneak (see
+ * {@link #updateGlideCancel}) - detected as a rising edge (sneak newly pressed, not merely held) so
+ * a player who was already sneaking when the glide started doesn't get it cancelled instantly.
  */
 public final class ArmorEffectsHandler {
+
+    /** Effectively permanent - removal is always explicit (see class doc), never left to expire. */
+    private static final int NIGHT_VISION_DURATION_TICKS = Integer.MAX_VALUE;
+
+    private final Map<UUID, Boolean> wasSneaking = new HashMap<>();
 
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
@@ -49,38 +61,38 @@ public final class ArmorEffectsHandler {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
-        boolean debugTick = player.tickCount % 10 == 0;
         boolean batmanActive = isBatmanActive(player);
-        if (!batmanActive) {
+
+        boolean shouldHaveNightVision = batmanActive && player.getItemBySlot(EquipmentSlot.HEAD).is(HJItems.BAT_COWL.get());
+        if (shouldHaveNightVision) {
+            if (!player.hasEffect(MobEffects.NIGHT_VISION)) {
+                player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION, NIGHT_VISION_DURATION_TICKS, 0, true, false, false));
+            }
+        } else if (player.hasEffect(MobEffects.NIGHT_VISION)) {
+            player.removeEffect(MobEffects.NIGHT_VISION);
+        }
+
+        updateGlideCancel(player, batmanActive);
+    }
+
+    private void updateGlideCancel(ServerPlayer player, boolean batmanActive) {
+        UUID id = player.getUUID();
+        boolean sneaking = player.isShiftKeyDown();
+        boolean justStartedSneaking = sneaking && !wasSneaking.getOrDefault(id, false);
+        wasSneaking.put(id, sneaking);
+
+        if (!justStartedSneaking || !player.isFallFlying()) {
             return;
         }
         boolean wearingChestplate = player.getItemBySlot(EquipmentSlot.CHEST).is(HJItems.BAT_ARMORED_CHESTPLATE.get());
-        if (!wearingChestplate) {
-            if (debugTick) {
-                HeroesJourney.LOGGER.info("[glide-debug] {} batmanActive=true chestplateWorn=false (need heroesjourney:bat_armored_chestplate in the chest slot specifically)",
-                        player.getGameProfile().getName());
-            }
-            return;
+        if (batmanActive && wearingChestplate) {
+            GlideSupport.setFallFlying(player, false);
         }
-        boolean onGround = player.onGround();
-        double velocityY = player.getDeltaMovement().y;
-        boolean falling = velocityY < 0 && !onGround;
-        boolean sneaking = player.isShiftKeyDown();
-        if (debugTick) {
-            HeroesJourney.LOGGER.info("[glide-debug] {} chestplateWorn=true sneaking={} onGround={} velocityY={} falling={} -> gliding={}",
-                    player.getGameProfile().getName(), sneaking, onGround, velocityY, falling, sneaking && falling);
-        }
-        if (sneaking && falling) {
-            // Short duration, refreshed every tick while gliding - fades out within a second of
-            // releasing sneak or landing rather than lingering, same trade-off already accepted
-            // for the suit's other pulse-refreshed effects (see BatmanEffects).
-            player.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 10, 0, true, false, false));
-            Vec3 look = player.getLookAngle();
-            Vec3 motion = player.getDeltaMovement();
-            double glideSpeed = HJConfig.GLIDE_HORIZONTAL_SPEED.get();
-            player.setDeltaMovement(motion.x * 0.6 + look.x * glideSpeed * 0.4, motion.y, motion.z * 0.6 + look.z * glideSpeed * 0.4);
-            player.fallDistance = 0.0F;
-        }
+    }
+
+    @SubscribeEvent
+    public void onLoggedOut(PlayerEvent.PlayerLoggedOutEvent event) {
+        wasSneaking.remove(event.getEntity().getUUID());
     }
 
     private boolean isBatmanActive(ServerPlayer player) {

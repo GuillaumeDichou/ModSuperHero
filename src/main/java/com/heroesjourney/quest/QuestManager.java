@@ -1,5 +1,6 @@
 package com.heroesjourney.quest;
 
+import com.heroesjourney.HeroesJourney;
 import com.heroesjourney.ability.AbilityRegistry;
 import com.heroesjourney.data.HJAttachments;
 import com.heroesjourney.data.HeroData;
@@ -223,12 +224,17 @@ public final class QuestManager {
 
     private void completeStage(ServerPlayer player, ServerLevel level, HeroData data, HeroProgress progress,
                                 HeroDefinition hero, Questline questline, QuestStage stage) {
+        HeroesJourney.LOGGER.info("[quest-debug] {} completing stage '{}' (stageIndex={}), flags before rewards: {}",
+                player.getGameProfile().getName(), stage.id(), progress.stageIndex(), progress.flags());
         for (QuestReward reward : stage.rewards()) {
             reward.grant(player);
         }
         for (StageHook hook : stage.onComplete()) {
             hook.run(player, level);
         }
+        HeroesJourney.LOGGER.info("[quest-debug] {} stage '{}' rewards granted, flags after rewards: {} (same HeroProgress instance: {})",
+                player.getGameProfile().getName(), stage.id(), progress.flags(),
+                progress == player.getData(HJAttachments.HERO_DATA).getProgress(hero.id()));
         progress.advanceStage();
 
         level.playSound(null, player.blockPosition(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, 1.0F, 1.4F);

@@ -109,12 +109,15 @@ public final class BatmanContent {
                 List.of(
                         new QuestObjective("run_distance", Component.translatable("objective.heroesjourney.batman.run_distance"),
                                 new RewardOnCompleteCondition(new TravelDistanceCondition(HJConfig.RUN_TRAINING_DISTANCE.get()),
+                                        Component.translatable("reward.heroesjourney.batman.run_trained"),
                                         player -> addFlag(player, BatmanAbilities.FLAG_RUN_TRAINED))),
                         new QuestObjective("jump_count", Component.translatable("objective.heroesjourney.batman.jump_count"),
                                 new RewardOnCompleteCondition(new JumpCountCondition(HJConfig.JUMP_TRAINING_COUNT.get()),
+                                        Component.translatable("reward.heroesjourney.batman.jump_trained"),
                                         player -> addFlag(player, BatmanAbilities.FLAG_JUMP_TRAINED))),
                         new QuestObjective("swim_distance", Component.translatable("objective.heroesjourney.batman.swim_distance"),
                                 new RewardOnCompleteCondition(new SwimDistanceCondition(HJConfig.SWIM_TRAINING_DISTANCE.get()),
+                                        Component.translatable("reward.heroesjourney.batman.swim_trained"),
                                         player -> addFlag(player, BatmanAbilities.FLAG_SWIM_TRAINED)))
                 ),
                 List.of(reward(Component.translatable("reward.heroesjourney.batman.riddle_book"), player ->
@@ -184,7 +187,11 @@ public final class BatmanContent {
     }
 
     private static void addFlag(ServerPlayer player, String flag) {
-        player.getData(com.heroesjourney.data.HJAttachments.HERO_DATA).getOrCreateProgress(HERO_ID).addFlag(flag);
+        com.heroesjourney.data.HeroProgress progress =
+                player.getData(com.heroesjourney.data.HJAttachments.HERO_DATA).getOrCreateProgress(HERO_ID);
+        progress.addFlag(flag);
+        HeroesJourney.LOGGER.info("[quest-debug] {} addFlag('{}') -> flags now: {}",
+                player.getGameProfile().getName(), flag, progress.flags());
     }
 
     private static QuestReward reward(Component summary, java.util.function.Consumer<ServerPlayer> apply) {

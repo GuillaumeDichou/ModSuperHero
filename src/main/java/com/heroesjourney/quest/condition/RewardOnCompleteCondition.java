@@ -16,10 +16,17 @@ public class RewardOnCompleteCondition implements QuestCondition {
 
     private final QuestCondition delegate;
     private final Consumer<ServerPlayer> onComplete;
+    private final Component rewardSummary;
 
-    public RewardOnCompleteCondition(QuestCondition delegate, Consumer<ServerPlayer> onComplete) {
+    public RewardOnCompleteCondition(QuestCondition delegate, Component rewardSummary, Consumer<ServerPlayer> onComplete) {
         this.delegate = delegate;
+        this.rewardSummary = rewardSummary;
         this.onComplete = onComplete;
+    }
+
+    /** Shown in the UI next to this objective, so a per-objective reward (unlike stage-level {@link com.heroesjourney.quest.QuestReward}s) is visible too. */
+    public Component rewardSummary() {
+        return rewardSummary;
     }
 
     @Override

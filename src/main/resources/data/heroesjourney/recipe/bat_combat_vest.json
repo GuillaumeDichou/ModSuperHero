@@ -1,14 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
-  "category": "misc",
-  "ingredients": [
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" },
-    { "item": "heroesjourney:kevlar_fiber" }
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "K K",
+    "KKK",
+    "KKK"
   ],
+  "key": {
+    "K": { "item": "heroesjourney:kevlar_fiber" }
+  },
   "result": {
     "id": "heroesjourney:bat_combat_vest",
     "count": 1

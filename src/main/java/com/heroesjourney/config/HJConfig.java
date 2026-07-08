@@ -47,9 +47,26 @@ public class HJConfig {
             .comment("Distance (blocs, a la nage) a parcourir pour l'entrainement 'nage'. Reduit a 100 temporairement pour faciliter les tests (garde un seuil > 1 pour pouvoir verifier que le comptage est proportionnel).")
             .defineInRange("questBatman.training.swimDistanceBlocks", 100, 1, 1000000);
 
-    public static final ModConfigSpec.IntValue RUN_TRAINING_SPEED_LEVEL = BUILDER
-            .comment("Niveau (0 = niveau I) de Vitesse permanente accordee par l'entrainement 'course'.")
-            .defineInRange("questBatman.training.runSpeedAmplifier", 0, 0, 4);
+    // Both speed bonuses below have 2 tiers, always strictly above the vanilla baseline (no
+    // training = no bonus at all): a base tier once trained, and a slightly reduced tier once the
+    // full 4-piece suit is ALSO worn (the suit's weight taking a small bite out of the training
+    // bonus, for flavor) - the full-suit tier must stay lower than the base tier but never drop to
+    // (or below) the untrained baseline.
+    public static final ModConfigSpec.DoubleValue SWIM_TRAINING_SPEED_BONUS = BUILDER
+            .comment("Bonus de vitesse de nage (attribut water_movement_efficiency, 0.0 a 1.0) accorde par l'entrainement 'nage' sans la tenue complete, applique uniquement pendant que le joueur est dans l'eau (verifie chaque tick, pas un effet de statut).")
+            .defineInRange("questBatman.training.swimSpeedBonus", 0.8, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue SWIM_TRAINING_SPEED_BONUS_FULL_SUIT = BUILDER
+            .comment("Bonus de vitesse de nage quand la tenue complete (4 pieces) est en plus portee - reduit par rapport a swimSpeedBonus (poids de la tenue), mais doit rester strictement positif.")
+            .defineInRange("questBatman.training.swimSpeedBonusFullSuit", 0.6, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RUN_TRAINING_SPEED_BONUS = BUILDER
+            .comment("Bonus de vitesse de deplacement (attribut movement_speed, pas un effet de statut) accorde par l'entrainement 'course' sans la tenue complete.")
+            .defineInRange("questBatman.training.runSpeedBonus", 0.065, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RUN_TRAINING_SPEED_BONUS_FULL_SUIT = BUILDER
+            .comment("Bonus de vitesse de deplacement quand la tenue complete (4 pieces) est en plus portee - reduit par rapport a runSpeedBonus (poids de la tenue), mais doit rester strictement positif.")
+            .defineInRange("questBatman.training.runSpeedBonusFullSuit", 0.04, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue JUMP_TRAINING_FALL_DAMAGE_REDUCTION = BUILDER
             .comment("Reduction des degats de chute (0.3 = -30%) accordee par l'entrainement 'saut'. Se cumule avec celle des jambieres.")
@@ -101,13 +118,9 @@ public class HJConfig {
             .comment("Nombre de mobs hostiles a vaincre a mains nues (coup fatal) pour valider la quete. Reduit a 1 temporairement pour faciliter les tests.")
             .defineInRange("questBatman.martialArts.kills", 1, 1, 10000);
 
-    public static final ModConfigSpec.DoubleValue UNARMED_DAMAGE_BONUS = BUILDER
-            .comment("Bonus additif aux degats a mains nues pour Batman actif, une fois l'entrainement aux arts martiaux valide.")
-            .defineInRange("questBatman.martialArts.unarmedDamageBonus", 2.0, 0.0, 20.0);
-
-    public static final ModConfigSpec.DoubleValue UNARMED_ATTACK_SPEED_BONUS = BUILDER
-            .comment("Bonus additif a la vitesse d'attaque a mains nues.")
-            .defineInRange("questBatman.martialArts.unarmedAttackSpeedBonus", 1.0, 0.0, 10.0);
+    public static final ModConfigSpec.DoubleValue MARTIAL_ARTS_DAMAGE_BONUS = BUILDER
+            .comment("Bonus additif FIXE de degats (ADD_VALUE sur l'attribut attack_damage reel, visible par /heroesjourney stats) pour Batman actif une fois l'entrainement aux arts martiaux valide - s'ajoute tel quel au-dessus des degats de N'IMPORTE QUELLE arme (poings, epee, hache...), pas un pourcentage. Cumulatif avec FULL_SUIT_DAMAGE_BONUS.")
+            .defineInRange("questBatman.martialArts.damageBonus", 1.1, 0.0, 20.0);
 
     // ---------------------------------------------------------------------
     // Quest 2 reward - mob detection reduction
@@ -130,9 +143,22 @@ public class HJConfig {
             .comment("Reduction des degats de chute apportee par les jambieres elles-memes (0.3 = -30%).")
             .defineInRange("questBatman.armor.fallDamageReduction", 0.3, 0.0, 1.0);
 
-    public static final ModConfigSpec.DoubleValue GLIDE_HORIZONTAL_SPEED = BUILDER
-            .comment("Vitesse horizontale (blocs/tick) appliquee en direction du regard pendant le plane.")
-            .defineInRange("questBatman.armor.glideHorizontalSpeed", 0.12, 0.0, 1.0);
+    // ---------------------------------------------------------------------
+    // Full-suit set bonus (quest 7): all 4 pieces worn + Batman active.
+    // Both this and MARTIAL_ARTS_DAMAGE_BONUS are fixed ADD_VALUE bonuses (not a percentage), general
+    // (any weapon, not unarmed-only), and cumulative with each other.
+    // ---------------------------------------------------------------------
+    public static final ModConfigSpec.DoubleValue FULL_SUIT_DAMAGE_BONUS = BUILDER
+            .comment("Bonus additif FIXE de degats (ADD_VALUE sur l'attribut attack_damage) accorde quand les 4 pieces de la tenue sont portees et Batman est le heros actif, quelle que soit l'arme en main. Cumulatif avec le bonus d'entrainement aux arts martiaux, ne le remplace pas.")
+            .defineInRange("questBatman.armor.fullSuitDamageBonus", 1.1, 0.0, 20.0);
+
+    public static final ModConfigSpec.DoubleValue FULL_SUIT_ARMOR_BONUS = BUILDER
+            .comment("Bonus additif de points d'armure (attribut armor) accorde quand les 4 pieces de la tenue sont portees et Batman est le heros actif.")
+            .defineInRange("questBatman.armor.fullSuitArmorBonus", 2.0, 0.0, 30.0);
+
+    public static final ModConfigSpec.DoubleValue FULL_SUIT_KNOCKBACK_RESISTANCE_BONUS = BUILDER
+            .comment("Bonus additif de resistance au recul (0.2 = +20%, attribut knockback_resistance) accorde quand les 4 pieces de la tenue sont portees et Batman est le heros actif.")
+            .defineInRange("questBatman.armor.fullSuitKnockbackResistanceBonus", 0.2, 0.0, 1.0);
 
     // ---------------------------------------------------------------------
     // Gadgets (quest 7 unlock)

@@ -20,8 +20,6 @@ public final class HeroData {
 
     /** Server-only, not persisted: ability id -> game time (in ticks) it becomes usable again. */
     private final transient Map<String, Long> abilityCooldowns = new HashMap<>();
-    /** Server-only, not persisted: accumulated sprinting distance for the current training objective. */
-    private transient double sprintDistanceAccumulator;
 
     public HeroData() {
         this(HeroRegistry.NONE, new HashMap<>(), true);
@@ -75,14 +73,6 @@ public final class HeroData {
 
     public void putAbilityCooldown(String abilityId, long readyAtGameTime) {
         abilityCooldowns.put(abilityId, readyAtGameTime);
-    }
-
-    public double sprintDistanceAccumulator() {
-        return sprintDistanceAccumulator;
-    }
-
-    public void setSprintDistanceAccumulator(double value) {
-        this.sprintDistanceAccumulator = value;
     }
 
     public static final Codec<HeroData> CODEC = RecordCodecBuilder.create(instance -> instance.group(

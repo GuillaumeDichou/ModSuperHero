@@ -1,13 +1,14 @@
 {
-  "type": "minecraft:crafting_shapeless",
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
-  "ingredients": [
-    { "item": "heroesjourney:memory_cloth" },
-    { "item": "heroesjourney:memory_cloth" },
-    { "item": "heroesjourney:memory_cloth" },
-    { "item": "heroesjourney:memory_cloth" },
-    { "item": "heroesjourney:memory_cloth" }
+  "pattern": [
+    " M ",
+    "MMM",
+    "M M"
   ],
+  "key": {
+    "M": { "item": "heroesjourney:memory_cloth" }
+  },
   "result": {
     "id": "heroesjourney:bat_cape",
     "count": 1

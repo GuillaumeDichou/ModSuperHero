@@ -5,6 +5,8 @@ import com.heroesjourney.config.HJConfig;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -37,6 +39,28 @@ public final class GrappleHandler {
         WAS_SNEAKING_AT_START.remove(player.getUUID());
     }
 
+    /**
+     * Visualizes the tether as a line of particles from the player to the anchor point, recomputed
+     * every tick of the pull so it stays attached to both ends as the player is reeled in - the
+     * pull itself was already working purely server-side (see {@link #onPlayerTick}'s velocity
+     * math), but with nothing rendered along the way it looked like nothing was happening at all.
+     */
+    private static void spawnTrail(ServerPlayer player, Vec3 from, Vec3 to) {
+        ServerLevel level = player.serverLevel();
+        Vec3 segment = to.subtract(from);
+        double length = segment.length();
+        if (length < 1.0E-4) {
+            return;
+        }
+        int points = (int) Math.min(40, Math.ceil(length));
+        Vec3 step = segment.scale(1.0 / points);
+        Vec3 pos = from;
+        for (int i = 0; i <= points; i++) {
+            level.sendParticles(ParticleTypes.END_ROD, pos.x, pos.y, pos.z, 1, 0.0, 0.0, 0.0, 0.0);
+            pos = pos.add(step);
+        }
+    }
+
     @SubscribeEvent
     public void onPlayerTick(PlayerTickEvent.Post event) {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
@@ -63,7 +87,9 @@ public final class GrappleHandler {
             cancelPull(player);
             return;
         }
-        Vec3 toTarget = target.subtract(player.position().add(0, player.getEyeHeight() * 0.5, 0));
+        Vec3 tetherOrigin = player.position().add(0, player.getEyeHeight() * 0.5, 0);
+        spawnTrail(player, tetherOrigin, target);
+        Vec3 toTarget = target.subtract(tetherOrigin);
         double distance = toTarget.length();
         if (distance < 1.75D) {
             HeroesJourney.LOGGER.info("[grapple-debug] {} pull arrived at age={} distance={}", player.getGameProfile().getName(), age, distance);
@@ -79,7 +105,16 @@ public final class GrappleHandler {
         }
         player.setDeltaMovement(motion);
         player.fallDistance = 0.0F;
+        // hasImpulse alone only tells the server to broadcast the new velocity to OTHER players
+        // tracking this entity (see ServerEntity#sendChanges' plain `broadcast`, gated on
+        // hasImpulse) - it does NOT reach the owning player's own client, which is what was
+        // making the grapple look like it did nothing at all even though the server-side velocity
+        // was being computed correctly every tick. hurtMarked is what makes ServerEntity use
+        // `broadcastAndSend` instead, which also pushes a ClientboundSetEntityMotionPacket to the
+        // entity's own connection - the same flag vanilla knockback relies on to actually move the
+        // hit player's own client, not just what other players see.
         player.hasImpulse = true;
+        player.hurtMarked = true;
         if (age % 5 == 0) {
             HeroesJourney.LOGGER.info("[grapple-debug] {} pulling age={} distance={} motion={}",
                     player.getGameProfile().getName(), age, distance, motion);

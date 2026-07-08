@@ -8,7 +8,9 @@ import com.heroesjourney.network.ActivateHeroPayload;
 import com.heroesjourney.network.HJNetworking;
 import com.heroesjourney.network.SetHudTrackerPayload;
 import com.heroesjourney.quest.QuestObjective;
+import com.heroesjourney.quest.QuestReward;
 import com.heroesjourney.quest.QuestStage;
+import com.heroesjourney.quest.condition.RewardOnCompleteCondition;
 import java.util.List;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -22,7 +24,12 @@ import net.minecraft.util.FormattedCharSequence;
  * Screen 2: a hero's questline, consultable even when that hero isn't active. Each stage shows
  * done / in-progress-with-counter / locked; there's an "Activate" button (with confirmation) and
  * an optional-HUD-tracker checkbox. The current stage additionally shows its narrative flavor
- * text (see {@link QuestStage#description()}) above its objectives.
+ * text (see {@link QuestStage#description()}), each objective's per-objective reward (if its
+ * condition is a {@link RewardOnCompleteCondition} - quest 3's three parallel sub-objectives each
+ * grant their own passive independently of the stage's own reward list), and the stage-level
+ * {@link QuestReward}s. Every one of those pieces of text is wrapped to the screen width via
+ * {@link #wrapped} rather than drawn on a single line, since several of them (reward summaries
+ * especially) are long enough to run off the edge of the screen otherwise.
  */
 public class HeroDetailScreen extends Screen {
 
@@ -97,26 +104,62 @@ public class HeroDetailScreen extends Screen {
         for (int i = 0; i < stages.size(); i++) {
             QuestStage stage = stages.get(i);
             if (y > this.height - 60 || y < 20) {
-                y += stageHeight(stage, i, currentStage, width);
+                y += stageHeight(stage, i, currentStage, progress, width);
                 continue;
             }
             y = renderStage(guiGraphics, stage, i, currentStage, progress, left, y, width);
         }
     }
 
-    private int stageHeight(QuestStage stage, int index, int currentStage, int width) {
+    private List<FormattedCharSequence> wrapped(Component component, int width) {
+        return this.font.split(component, width);
+    }
+
+    private int stageHeight(QuestStage stage, int index, int currentStage, HeroProgress progress, int width) {
         if (index > currentStage) {
             return 14;
         }
-        int height = 14 + stage.objectives().size() * 10;
         if (index == currentStage) {
-            height += descriptionLines(stage, width).size() * 10 + 3;
+            return 14 + currentStageExtraHeight(stage, progress, width);
+        }
+        return 14 + stage.objectives().size() * 10;
+    }
+
+    /** Height (in pixels) of everything {@link #renderStage} draws below the title for the current stage: description, objectives (+ their per-objective rewards), and the stage-level rewards. */
+    private int currentStageExtraHeight(QuestStage stage, HeroProgress progress, int width) {
+        int height = descriptionLines(stage, width).size() * 10 + 3;
+        for (QuestObjective objective : stage.objectives()) {
+            int value = progress == null ? 0 : progress.progressFor(stage.id() + ":" + objective.id());
+            height += wrapped(objectiveLine(objective, value), width).size() * 10;
+            if (objective.condition() instanceof RewardOnCompleteCondition roc) {
+                height += wrapped(rewardLine(roc.rewardSummary()), width).size() * 10;
+            }
+        }
+        if (!stage.rewards().isEmpty()) {
+            height += 2;
+            for (QuestReward reward : stage.rewards()) {
+                height += wrapped(rewardLine(reward.summary()), width).size() * 10;
+            }
         }
         return height;
     }
 
     private List<FormattedCharSequence> descriptionLines(QuestStage stage, int width) {
         return this.font.split(stage.description(), width);
+    }
+
+    private MutableComponent objectiveLine(QuestObjective objective, int value) {
+        boolean done = objective.condition().isComplete(value);
+        Component progressText = objective.condition().describeProgress(value);
+        MutableComponent objLine = Component.literal(done ? "  ✓ " : "  - ").append(objective.label());
+        if (!progressText.getString().isEmpty()) {
+            objLine.append(Component.literal(" (" + progressText.getString() + ")"));
+        }
+        return objLine;
+    }
+
+    private MutableComponent rewardLine(Component summary) {
+        return Component.literal("  ★ ").append(summary);
     }
 
     private int renderStage(GuiGraphics g, QuestStage stage, int index, int currentStage, HeroProgress progress, int left, int y, int width) {
@@ -142,16 +185,27 @@ public class HeroDetailScreen extends Screen {
             }
             y += 3;
             for (QuestObjective objective : stage.objectives()) {
-                String key = stage.id() + ":" + objective.id();
-                int value = progress.progressFor(key);
+                int value = progress.progressFor(stage.id() + ":" + objective.id());
                 boolean done = objective.condition().isComplete(value);
-                Component progressText = objective.condition().describeProgress(value);
-                MutableComponent objLine = Component.literal(done ? "  ✓ " : "  - ").append(objective.label());
-                if (!progressText.getString().isEmpty()) {
-                    objLine.append(Component.literal(" (" + progressText.getString() + ")"));
+                for (FormattedCharSequence objLine : wrapped(objectiveLine(objective, value), width)) {
+                    g.drawString(this.font, objLine, left, y, done ? HJTheme.GREEN : HJTheme.TEXT, false);
+                    y += 10;
                 }
-                g.drawString(this.font, objLine, left, y, done ? HJTheme.GREEN : HJTheme.TEXT, false);
-                y += 10;
+                if (objective.condition() instanceof RewardOnCompleteCondition roc) {
+                    for (FormattedCharSequence rewardTextLine : wrapped(rewardLine(roc.rewardSummary()), width)) {
+                        g.drawString(this.font, rewardTextLine, left, y, HJTheme.ACCENT, false);
+                        y += 10;
+                    }
+                }
+            }
+            if (!stage.rewards().isEmpty()) {
+                y += 2;
+                for (QuestReward reward : stage.rewards()) {
+                    for (FormattedCharSequence rewardTextLine : wrapped(rewardLine(reward.summary()), width)) {
+                        g.drawString(this.font, rewardTextLine, left, y, HJTheme.ACCENT, false);
+                        y += 10;
+                    }
+                }
             }
         } else if (index < currentStage) {
             y += 1;

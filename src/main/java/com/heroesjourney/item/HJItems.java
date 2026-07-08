@@ -1,6 +1,7 @@
 package com.heroesjourney.item;
 
 import com.heroesjourney.HeroesJourney;
+import com.heroesjourney.item.armor.BatChestplateItem;
 import com.heroesjourney.item.armor.BatSuitArmorMaterial;
 import com.heroesjourney.item.gadget.BatarangItem;
 import com.heroesjourney.item.gadget.GrappleHookItem;
@@ -41,7 +42,7 @@ public final class HJItems {
             new Item.Properties().durability(ArmorItem.Type.HELMET.getDurability(BatSuitArmorMaterial.BASE_DURABILITY)));
 
     public static final DeferredItem<ArmorItem> BAT_ARMORED_CHESTPLATE = ITEMS.registerItem("bat_armored_chestplate",
-            props -> new ArmorItem(BatSuitArmorMaterial.BAT_SUIT, ArmorItem.Type.CHESTPLATE, props),
+            props -> new BatChestplateItem(BatSuitArmorMaterial.BAT_SUIT, ArmorItem.Type.CHESTPLATE, props),
             new Item.Properties().durability(ArmorItem.Type.CHESTPLATE.getDurability(BatSuitArmorMaterial.BASE_DURABILITY)).rarity(Rarity.RARE));
 
     public static final DeferredItem<ArmorItem> BAT_LEGGINGS = ITEMS.registerItem("bat_leggings",
